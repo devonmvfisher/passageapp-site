@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Passage</title>
+<meta name="description" content="Playable worlds, and small tools that check AI work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Grenze+Gotisch:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0a0507; --ink2:#13080b; --wine:#2a070e; --blood:#7d0c1c; --crimson:#b8142d; --crimson2:#d61f3b;
+    --white:#fff6f3; --text:#efe2e2; --dim:#c6adb1; --gold:#d6a85a; --frame:rgba(214,168,90,.55); --rule:rgba(184,20,45,.38);
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--ink); color:var(--text); font:500 20px/1.5 "Cormorant Garamond", Georgia, serif; font-variant-numeric:lining-nums; overflow-x:hidden; }
+  a { color:var(--white); text-decoration-color:var(--crimson2); text-underline-offset:3px; }
+  a:hover, a:focus-visible { color:#ffd9de; }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 18px; }
+
+  /* The arch: a window onto a real frame of Vesper, gold frame, crimson light */
+  header { position:relative; padding:32px 0 0; text-align:center; isolation:isolate; overflow-x:clip; }
+  header::before { content:""; position:absolute; z-index:-1; left:50%; top:-120px; width:min(1500px, 190vw); height:1250px; transform:translateX(-50%);
+          background:radial-gradient(closest-side, rgba(184,20,45,.42), rgba(125,12,28,.18) 55%, rgba(10,5,7,0) 100%); pointer-events:none; }
+  .arch { position:relative; z-index:1; margin:0 auto; width:min(570px, 92vw); aspect-ratio:3/4; border-radius:50% 50% 12px 12px / 34% 34% 12px 12px; overflow:hidden;
+          border:2px solid var(--gold); background:#030203;
+          box-shadow:0 0 0 7px var(--ink), 0 0 0 8px var(--frame), 0 0 70px 6px rgba(184,20,45,.55), 0 40px 160px 10px rgba(184,20,45,.45); }
+  .arch .sky, .arch iframe { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+  .arch .sky { object-fit:cover; object-position:50% 40%; }
+  .arch .veil { position:absolute; inset:0; pointer-events:none;
+          background:linear-gradient(180deg, rgba(60,0,12,.22) 0%, rgba(70,0,14,.10) 36%, rgba(54,0,11,.70) 60%, rgba(26,2,7,.96) 84%); }
+  .arch .tracery { position:absolute; inset:12px 12px 0; border:1px solid var(--frame); border-bottom:0; border-radius:50% 50% 0 0 / 33% 33% 0 0; pointer-events:none;
+          -webkit-mask-image:linear-gradient(180deg, #000 0, #000 45%, transparent 62%); mask-image:linear-gradient(180deg, #000 0, #000 45%, transparent 62%); }
+  .arch .glass { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; pointer-events:none; }
+  .arch .title { position:relative; padding:24px 22px 6.5%; }
+  .arch .title::before { content:""; position:absolute; top:0; left:7%; right:7%; height:2px;
+          background:linear-gradient(90deg, transparent, var(--frame) 18%, var(--frame) 82%, transparent); }
+  h1 { margin:0; font:900 clamp(70px, 18vw, 150px)/.86 "Grenze Gotisch", "Cormorant Garamond", serif; color:var(--white);
+       text-shadow:0 0 28px rgba(214,31,59,.75), 0 0 2px rgba(0,0,0,.9), 0 6px 26px rgba(0,0,0,.6); }
+  .tag { margin:12px auto 16px; max-width:34ch; color:var(--white); font-size:clamp(19px, 2.6vw, 22px); line-height:1.35; text-shadow:0 1px 8px #000; }
+  .arch .title .btn { pointer-events:auto; }
+  .arch .closer { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); z-index:4; display:none; }
+  .arch iframe { z-index:3; background:#000; }
+  .arch.playing .closer { display:inline-block; }
+  .arch.playing .glass, .arch.playing .tracery { display:none; }
+  .sky { overflow:hidden; font-size:13px; line-height:1.3; color:transparent; }
+  .caption { position:relative; z-index:1; margin:16px 0 0; color:var(--dim); font-size:16px; }
+  .arch.playing + .caption { visibility:hidden; }
+  .spill { position:absolute; z-index:0; left:50%; top:calc(32px + min(570px, 92vw) * 4 / 3 - 30px); width:min(1100px, 150vw); height:420px; transform:translateX(-50%);
+          background:linear-gradient(180deg, rgba(184,20,45,.40), rgba(125,12,28,.12) 55%, rgba(10,5,7,0));
+          clip-path:polygon(28% 0, 72% 0, 100% 100%, 0 100%); filter:blur(22px); pointer-events:none; }
+
+  .btn { display:inline-block; font:700 18px/1 "Cormorant Garamond", Georgia, serif; color:var(--white); background:var(--crimson);
+         border:1px solid var(--crimson2); border-radius:3px; padding:12px 18px 13px; cursor:pointer; text-decoration:none; }
+  .btn:hover, .btn:focus-visible { background:var(--crimson2); color:var(--white); outline:2px solid var(--white); outline-offset:2px; }
+  .btn.ghost { background:transparent; }
+  .btn.ghost:hover, .btn.ghost:focus-visible { background:rgba(184,20,45,.22); }
+
+  main { position:relative; z-index:1; }
+  section { padding:44px 0 0; }
+  h2 { margin:0; font:700 clamp(40px, 5.6vw, 56px)/1 "Grenze Gotisch", "Cormorant Garamond", serif; color:var(--white); }
+  .lede { margin:6px 0 18px; font-size:clamp(20px, 2.6vw, 24px); color:var(--dim); }
+
+  .worlds { list-style:none; margin:0; padding:0; border-bottom:1px solid var(--rule); }
+  .world { display:grid; grid-template-columns:84px 1fr auto; gap:6px 24px; align-items:center; padding:16px 0; border-top:1px solid var(--rule); }
+  .world .num { font:700 56px/1 "Cormorant Garamond", Georgia, serif; color:var(--crimson2); text-align:center; text-shadow:0 0 22px rgba(184,20,45,.5); }
+  .world h3 { margin:0 0 2px; font:700 34px/1.1 "Cormorant Garamond", Georgia, serif; color:var(--white); }
+  .world p { margin:0; max-width:54ch; }
+  .nw { white-space:nowrap; }
+  .world .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+  .term { background:#0d0608; border:1px solid var(--rule); border-radius:4px; overflow:hidden; }
+  .term .bar { padding:8px 14px; background:#170a0d; font:400 13px "JetBrains Mono", monospace; color:var(--dim); border-bottom:1px solid var(--rule); }
+  .term .body { padding:14px 16px 2px; font:15px/1.55 "JetBrains Mono", monospace; color:#f3e9ea; }
+  .term .p { color:var(--crimson2); }
+  .term .entry { margin:0 0 14px; }
+  .term .note { color:var(--dim); }
+
+  .law { list-style:none; margin:14px 0 0; padding:0; display:grid; gap:0; border-bottom:1px solid var(--rule); }
+  .law li { display:grid; grid-template-columns:84px 1fr; gap:0 24px; align-items:baseline; padding:10px 0; border-top:1px solid var(--rule); }
+  .law .num { font:700 40px/1 "Cormorant Garamond", Georgia, serif; color:var(--crimson2); text-align:center; }
+  .law strong { display:block; font:700 clamp(26px, 3.2vw, 32px)/1.15 "Cormorant Garamond", Georgia, serif; color:var(--white); }
+  .law .ex { display:block; margin-top:2px; color:var(--dim); }
+
+  footer { margin:44px 0 0; padding:18px 0 30px; border-top:1px solid var(--rule); color:var(--dim); font-size:17px; }
+  footer .wrap { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+  @media (max-width:700px) {
+    .world { grid-template-columns:52px 1fr; }
+    .world .num { font-size:44px; }
+    .world .row { grid-column:1 / -1; justify-content:flex-start; padding-left:78px; }
+    .law li { grid-template-columns:52px 1fr; }
+    .law .num { font-size:30px; }
+  }
+  @media (max-width:420px) { .world .row { padding-left:0; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="arch" id="arch">
+      <img class="sky" src="hero-vesper-arch.jpg" width="1050" height="1400" alt="A frame from Vesper: the Earth from orbit, with satellites, in a field of stars.">
+      <div class="veil" aria-hidden="true"></div>
+      <div class="tracery" aria-hidden="true"></div>
+      <div class="glass">
+        <div class="title">
+          <h1>Passage</h1>
+          <p class="tag">A one-founder studio in Manitoba. Myth on one side, machines on the other.</p>
+          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/vesper/">Play Vesper here</button>
+        </div>
+      </div>
+      <button class="btn closer" id="closer" type="button">Close the window</button>
+    </div>
+    <p class="caption">In the window: a frame from Vesper, World I below.</p>
+  </div>
+  <div class="spill" aria-hidden="true"></div>
+</header>
+
+<main class="wrap">
+  <section id="worlds" aria-labelledby="worlds-h">
+    <h2 id="worlds-h">Enter a world</h2>
+    <p class="lede">Three you can play here, in the window.</p>
+    <ol class="worlds">
+      <li class="world">
+        <span class="num" aria-hidden="true">I</span>
+        <div>
+          <h3>Vesper</h3>
+          <p>A free planetarium and space toy in your browser. Fly a solar system, soft-land, float or pilot.</p>
+        </div>
+        <div class="row">
+          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/vesper/">Play in the window</button>
+          <a class="btn ghost" href="https://devonmvfisher.github.io/vesper/" target="_blank" rel="noopener">Open full page</a>
+        </div>
+      </li>
+      <li class="world">
+        <span class="num" aria-hidden="true">II</span>
+        <div>
+          <h3>Feel and Be Felt</h3>
+          <p>One of our three Tripothon S1 entries. A gift lowered into a Flatland whose people feel only the slice in their plane.</p>
+        </div>
+        <div class="row">
+          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/feel-and-be-felt/">Play in the window</button>
+          <a class="btn ghost" href="https://devonmvfisher.github.io/feel-and-be-felt/" target="_blank" rel="noopener">Open full page</a>
+        </div>
+      </li>
+      <li class="world">
+        <span class="num" aria-hidden="true">III</span>
+        <div>
+          <h3>Alder &amp; Water</h3>
+          <p>A little cottage room in the browser, the first room of a <span class="nw">slice-of-life</span> sim. In development.</p>
+        </div>
+        <div class="row">
+          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/alder.html">Play in the window</button>
+          <a class="btn ghost" href="https://devonmvfisher.github.io/alder.html" target="_blank" rel="noopener">Open full page</a>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="tools" aria-labelledby="tools-h">
+    <h2 id="tools-h">The machine side</h2>
+    <p class="lede">Small tools that check AI work.</p>
+    <div class="term">
+      <div class="bar">passage ~ public</div>
+      <div class="body">
+        <div class="entry"><span class="p">$</span> <a href="https://github.com/devonmvfisher/field-report-2026">field-report-2026</a><br>An independent user's field report on Claude Code, the Claude desktop app and Claude in Chrome: 60 items, each with its severity, first-seen date and where it was reported, plus one page on how they were found and checked.</div>
+        <div class="entry"><span class="p">$</span> <a href="https://github.com/devonmvfisher/session-counter">session-counter</a><br>Recounts failed requests, give-ups, watchdog kills and lost agents from your own Claude Code logs. Standard library only.</div>
+        <div class="entry note"><span class="p">$</span> more on the bench: blind frame checks for AI video, cut and loudness checks, quote and clock checks for agent replies. Being prepared for release.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="law" aria-labelledby="law-h">
+    <h2 id="law-h">The law of the house</h2>
+    <ol class="law">
+      <li><span class="num" aria-hidden="true">I</span><span><strong>Every claim gets a source.</strong><span class="ex">Our <a href="https://github.com/devonmvfisher/field-report-2026">field report</a> says where its 60 items came from and how they were counted.</span></span></li>
+      <li><span class="num" aria-hidden="true">II</span><span><strong>Every result gets checked.</strong><span class="ex">Its method page says how the items were checked against the records, and where the checking stops.</span></span></li>
+      <li><span class="num" aria-hidden="true">III</span><span><strong>The human calls it.</strong><span class="ex">Devon Fisher, the founder, makes the final call.</span></span></li>
+    </ol>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Devon Fisher, founder &middot; <a href="mailto:devon@passageapp.ca">devon@passageapp.ca</a> &middot; <a href="https://github.com/devonmvfisher">github.com/devonmvfisher</a></span>
+    <span>Passage &middot; Manitoba, Canada &middot; 2026</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const arch = document.getElementById('arch');
+  const closer = document.getElementById('closer');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('[data-play]').forEach(b => b.addEventListener('click', () => {
+    let f = arch.querySelector('iframe');
+    if (!f) { f = document.createElement('iframe'); f.title = 'Playable world'; f.allow = 'fullscreen'; arch.appendChild(f); }
+    f.src = b.dataset.play; arch.classList.add('playing');
+    arch.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'center' });
+  }));
+  closer.addEventListener('click', () => {
+    const f = arch.querySelector('iframe'); if (f) f.remove();
+    arch.classList.remove('playing');
+  });
+})();
+</script>
+</body>
+</html>
