@@ -39,7 +39,7 @@
   .arch { position:relative; z-index:1; margin:0 auto; width:min(570px, 92vw); aspect-ratio:3/4; border-radius:50% 50% 12px 12px / 34% 34% 12px 12px; overflow:hidden;
           border:2px solid var(--gold); background:#030203;
           box-shadow:0 0 0 7px var(--ink), 0 0 0 8px var(--frame), 0 0 70px 6px rgba(184,20,45,.55), 0 40px 160px 10px rgba(184,20,45,.45); }
-  .arch .sky, .arch iframe { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+  .arch .sky { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
   .arch .sky { object-fit:cover; object-position:50% 40%; }
   .arch .veil { position:absolute; inset:0; pointer-events:none;
           background:linear-gradient(180deg, rgba(60,0,12,.22) 0%, rgba(70,0,14,.10) 36%, rgba(54,0,11,.70) 60%, rgba(26,2,7,.96) 84%); }
@@ -54,10 +54,28 @@
   .tag { margin:12px auto 16px; max-width:34ch; color:var(--white); font-size:clamp(19px, 2.6vw, 22px); line-height:1.35; text-shadow:0 1px 8px #000; }
   .sub { margin:-8px auto 16px; max-width:38ch; color:var(--text); font-size:clamp(17px, 2.2vw, 19px); line-height:1.35; text-shadow:0 1px 8px #000; }
   .arch .title .btn { pointer-events:auto; }
-  .arch .closer { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); z-index:4; display:none; }
-  .arch iframe { z-index:3; background:#000; }
-  .arch.playing .closer { display:inline-block; }
-  .arch.playing .glass, .arch.playing .tracery { display:none; }
+  .arch.playing { width:100%; aspect-ratio:auto; height:min(820px, calc(100vh - 64px)); height:min(820px, calc(100dvh - 64px)); min-height:280px; border-radius:4px; overflow:visible; text-align:left; }
+  .arch.playing > .sky, .arch.playing > .veil, .arch.playing > .glass, .arch.playing > .tracery, .arch.playing > .hero-image-fallback { display:none; }
+  .hero-image-fallback { position:absolute; top:16%; left:10%; right:10%; margin:0; color:var(--text); font:600 18px/1.35 "Cormorant Garamond", Georgia, serif; text-align:center; }
+  .player-panel { height:100%; min-height:0; display:grid; grid-template-rows:auto auto auto minmax(0, 1fr); background:var(--ink); border-radius:2px; }
+  .player-panel[hidden] { display:none; }
+  .player-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; padding:10px 12px; border-bottom:1px solid var(--rule); }
+  .player-name { margin:0; min-width:0; overflow-wrap:anywhere; font:700 23px/1.2 "Cormorant Garamond", Georgia, serif; }
+  .player-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .player-actions .btn { padding:10px 12px; font-size:17px; }
+  .player-actions .btn:disabled { opacity:.65; cursor:wait; }
+  .player-hint, .player-status { margin:0; padding:6px 12px; font:500 16px/1.3 "Cormorant Garamond", Georgia, serif; color:var(--dim); }
+  .player-hint { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; }
+  .player-hint[hidden] { display:none; }
+  .hint-dismiss { padding:0; border:0; color:var(--white); background:none; font:inherit; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .hint-dismiss:focus-visible { outline:2px solid var(--white); outline-offset:3px; }
+  .player-status { color:var(--white); }
+  .player-status[hidden] { display:none; }
+  .player-frame { grid-row:4; position:relative; min-width:0; min-height:0; background:#000; }
+  .player-frame iframe { display:block; width:100%; height:100%; position:absolute; inset:0; border:0; border-radius:0; }
+  .arch:fullscreen { width:100%; height:100%; min-height:0; max-width:none; margin:0; border:0; border-radius:0; box-shadow:none; background:var(--ink); padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  .arch::backdrop { background:var(--ink); }
+  header.world-open .spill { display:none; }
   .sky { overflow:hidden; font-size:13px; line-height:1.3; color:transparent; }
   .caption { position:relative; z-index:1; margin:16px 0 0; color:var(--dim); font-size:16px; }
   .arch.playing + .caption { visibility:hidden; }
@@ -136,7 +154,8 @@
 <header>
   <div class="wrap">
     <div class="arch" id="arch">
-      <img class="sky" src="hero-vesper-arch.jpg" width="1050" height="1400" alt="A frame from Vesper: the Earth from orbit, with satellites, in a field of stars.">
+      <img class="sky" id="hero-art" src="hero-vesper-arch.jpg" width="1050" height="1400" alt="A frame from Vesper: the Earth from orbit, with satellites, in a field of stars.">
+      <p class="hero-image-fallback" id="hero-image-fallback" aria-hidden="true" hidden>Preview image unavailable.</p>
       <div class="veil" aria-hidden="true"></div>
       <div class="tracery" aria-hidden="true"></div>
       <div class="glass">
@@ -147,9 +166,21 @@
           <button class="btn" type="button" data-play="https://devonmvfisher.github.io/vesper/">Play Vesper here</button>
         </div>
       </div>
-      <button class="btn closer" id="closer" type="button">Close the window</button>
+      <div class="player-panel" id="player-panel" hidden>
+        <div class="player-toolbar">
+          <p class="player-name" id="player-name">Playable world</p>
+          <div class="player-actions" role="group" aria-label="World controls">
+            <button class="btn ghost" id="fullscreen" type="button" aria-pressed="false">Full screen</button>
+            <a class="btn ghost" id="player-open" href="https://devonmvfisher.github.io/vesper/" target="_blank" rel="noopener">Open full page</a>
+            <button class="btn" id="closer" type="button" aria-label="Close the window">Close</button>
+          </div>
+        </div>
+        <div class="player-hint" id="player-hint"><span>On a slow connection, the world may take time to appear. Full screen keeps this session; Open full page starts a separate session.</span><button class="hint-dismiss" id="hide-player-hint" type="button">Hide tip</button></div>
+        <p class="player-status" id="player-status" role="status" aria-live="polite" hidden></p>
+        <div class="player-frame" id="player-frame"></div>
+      </div>
     </div>
-    <p class="caption">In the window: a frame from Vesper, World I below.</p>
+    <p class="caption" id="arch-caption" role="status" aria-live="polite">In the window: a frame from Vesper, World I below.</p>
   </div>
   <div class="spill" aria-hidden="true"></div>
 </header>
@@ -293,17 +324,192 @@
 <script>
 (() => {
   const arch = document.getElementById('arch');
+  const header = arch.closest('header');
+  const panel = document.getElementById('player-panel');
+  const host = document.getElementById('player-frame');
   const closer = document.getElementById('closer');
+  const fullscreen = document.getElementById('fullscreen');
+  const fullPage = document.getElementById('player-open');
+  const name = document.getElementById('player-name');
+  const status = document.getElementById('player-status');
+  const hero = document.getElementById('hero-art');
+  const caption = document.getElementById('arch-caption');
+  const imageFallback = document.getElementById('hero-image-fallback');
+  const hint = document.getElementById('player-hint');
+  const hideHint = document.getElementById('hide-player-hint');
+  const normalCaption = caption.textContent;
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.querySelectorAll('[data-play]').forEach(b => b.addEventListener('click', () => {
-    let f = arch.querySelector('iframe');
-    if (!f) { f = document.createElement('iframe'); f.title = 'Playable world'; f.allow = 'fullscreen'; arch.appendChild(f); }
-    f.src = b.dataset.play; arch.classList.add('playing');
-    arch.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'center' });
-  }));
-  closer.addEventListener('click', () => {
-    const f = arch.querySelector('iframe'); if (f) f.remove();
+  let frame = null;
+  let activeUrl = '';
+  let opener = null;
+  let session = 0;
+  let pendingFullscreen = false;
+  let exitingFullscreen = false;
+  let wasFullscreen = false;
+  let lastFullscreenExit = -Infinity;
+
+  function ownsFullscreen() {
+    const element = document.fullscreenElement;
+    return !!element && (element === arch || arch.contains(element));
+  }
+  function say(message) {
+    status.textContent = message;
+    status.hidden = !message;
+  }
+  function syncFullscreen() {
+    const active = ownsFullscreen();
+    fullscreen.textContent = active ? 'Exit full screen' : 'Full screen';
+    fullscreen.setAttribute('aria-pressed', String(active));
+    fullscreen.disabled = pendingFullscreen || exitingFullscreen;
+  }
+  function restoreArch() {
+    if (frame || ownsFullscreen()) return;
+    const restoreFocus = !panel.hidden;
+    panel.hidden = true;
     arch.classList.remove('playing');
+    header.classList.remove('world-open');
+    say('');
+    name.textContent = 'Playable world';
+    syncFullscreen();
+    if (restoreFocus && opener && opener.isConnected) opener.focus();
+  }
+  function showClosedFullscreen() {
+    panel.hidden = false;
+    arch.classList.add('playing');
+    header.classList.add('world-open');
+    name.textContent = 'World closed';
+    say('The world is closed. Press Esc or Exit full screen to return.');
+    syncFullscreen();
+  }
+  async function leaveFullscreen() {
+    if (exitingFullscreen) return;
+    if (!ownsFullscreen()) { restoreArch(); return; }
+    const current = session;
+    exitingFullscreen = true;
+    syncFullscreen();
+    try {
+      await document.exitFullscreen();
+    } catch (_) {
+      if (current === session) {
+        if (!frame) showClosedFullscreen();
+        else say('Could not leave full screen. Press Esc to return to the page.');
+      }
+    } finally {
+      exitingFullscreen = false;
+      syncFullscreen();
+      if (!frame) restoreArch();
+    }
+  }
+  function openWorld(button) {
+    const url = button.dataset.play;
+    const world = button.closest('.world');
+    const title = world ? world.querySelector('h3').textContent : 'Vesper';
+    opener = button;
+    if (!frame) {
+      frame = document.createElement('iframe');
+      frame.allow = 'fullscreen';
+      frame.setAttribute('allowfullscreen', '');
+      host.appendChild(frame);
+    }
+    if (activeUrl !== url) {
+      session += 1;
+      activeUrl = url;
+      frame.src = url;
+    }
+    frame.title = title + ' playable world';
+    fullPage.href = url;
+    fullPage.setAttribute('aria-label', 'Open ' + title + ' full page in a new tab');
+    name.textContent = title;
+    say('');
+    panel.hidden = false;
+    arch.classList.add('playing');
+    header.classList.add('world-open');
+    syncFullscreen();
+    arch.scrollIntoView({ behavior:still ? 'auto' : 'smooth', block:'start' });
+    closer.focus({ preventScroll:true });
+  }
+  function closeWorld() {
+    session += 1;
+    if (frame) frame.remove();
+    frame = null;
+    activeUrl = '';
+    if (ownsFullscreen()) {
+      showClosedFullscreen();
+      void leaveFullscreen();
+    } else restoreArch();
+  }
+  document.querySelectorAll('[data-play]').forEach(button => {
+    button.addEventListener('click', () => openWorld(button));
+  });
+  closer.addEventListener('click', closeWorld);
+  hideHint.addEventListener('click', () => {
+    hint.hidden = true;
+    closer.focus({ preventScroll:true });
+  });
+  fullscreen.addEventListener('click', async () => {
+    if (pendingFullscreen || exitingFullscreen) return;
+    if (ownsFullscreen()) { await leaveFullscreen(); return; }
+    if (!frame) return;
+    if (typeof arch.requestFullscreen !== 'function' || document.fullscreenEnabled === false) {
+      say('Full screen is not available here. Keep playing in this window or choose Open full page.');
+      return;
+    }
+    const current = session;
+    pendingFullscreen = true;
+    syncFullscreen();
+    try {
+      // Called directly from the user's click, before any await.
+      await arch.requestFullscreen();
+      if (current !== session) {
+        // A closed or replaced session must not carry its pending request into the new one.
+        if (document.fullscreenElement === arch) await leaveFullscreen();
+        return;
+      }
+      if (frame) say('');
+      if (!frame && ownsFullscreen()) { showClosedFullscreen(); await leaveFullscreen(); }
+    } catch (_) {
+      if (current === session && frame) {
+        say('Full screen was not allowed. Keep playing in this window or choose Open full page.');
+      }
+    } finally {
+      pendingFullscreen = false;
+      syncFullscreen();
+      if (!frame) restoreArch();
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    const active = ownsFullscreen();
+    if (wasFullscreen && !active) lastFullscreenExit = performance.now();
+    const returned = wasFullscreen && !active;
+    wasFullscreen = active;
+    syncFullscreen();
+    if (!frame) {
+      if (active) { showClosedFullscreen(); void leaveFullscreen(); }
+      else restoreArch();
+    } else if (returned) {
+      say('');
+      fullscreen.focus({ preventScroll:true });
+    }
+  });
+  function showImageError() {
+    imageFallback.hidden = false;
+    caption.textContent = location.protocol === 'file:'
+      ? 'Preview image unavailable. Extract all files and keep hero-vesper-arch.jpg beside index.html.'
+      : 'Preview image unavailable. You can still use the world links below.';
+  }
+  hero.addEventListener('error', showImageError);
+  hero.addEventListener('load', () => {
+    imageFallback.hidden = true;
+    caption.textContent = normalCaption;
+  });
+  // A finished failed image may predate these listeners; pending images are left alone.
+  if (hero.complete && hero.naturalWidth === 0) showImageError();
+  document.addEventListener('keydown', event => {
+    // Cross-origin game key events do not bubble here. Native Esc still exits fullscreen.
+    if (event.key !== 'Escape' || event.repeat || event.defaultPrevented || !frame) return;
+    if (ownsFullscreen() || pendingFullscreen || performance.now() - lastFullscreenExit < 300) return;
+    event.preventDefault();
+    closeWorld();
   });
 })();
 </script>
