@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security & Threat Intelligence | Passage</title>
+<meta name="description" content="shadow-xray v0.8.0 static AST/JS taint engine, public malware infrastructure takedowns, and reproducible AI agent verification repositories.">
+<link rel="canonical" href="https://passageapp.ca/security/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#090507">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://passageapp.ca/security/">
+<meta property="og:title" content="Security & Threat Intelligence | Passage">
+<meta property="og:description" content="shadow-xray v0.8.0 static AST/JS taint engine, public malware infrastructure takedowns, and reproducible AI agent verification repositories.">
+<meta property="og:image" content="https://passageapp.ca/og-poster.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Grenze+Gotisch:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="../index.html" aria-label="Passage Home">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span class="brand-name">Passage</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../security/" class="active">Security</a>
+      <a href="../services/">Services &amp; Hire</a>
+      <a href="../lab/">Interactive Lab</a>
+      <a href="../studio/">Worlds &amp; Studio</a>
+      <a href="../services/#support">Support</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="pill-mono" href="../llms.txt" title="Machine-readable studio index for AI agents">/llms.txt</a>
+      <a class="btn sm" href="../services/#contact">Work With Me</a>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="band">
+    <p class="eyebrow">Door 01 &middot; Security, Threat Intel &amp; Verification</p>
+    <h1 class="page-h">Security Arsenal</h1>
+    <p class="lead">Cleanroom static analysis, passive malware infrastructure disruption, and deterministic verification harnesses for AI agents.</p>
+
+    <div class="callout" style="margin-top:24px">
+      <div>
+        <span class="card-num">Flagship Open-Source Engine &middot; MIT &middot; Python 3.10+ Stdlib Only</span>
+        <h3 style="margin-top:6px">Shadow X-Ray (v0.8.0)</h3>
+        <p>Zero-dependency Python AST &amp; JavaScript/TypeScript taint scanner, mobile .ipa/.apk store-rejection MRI, git security-commit sibling miner, OSV.dev dedup gate, and passive threat-intel watchdog wired to OpenPhish, MetaMask, ScamSniffer, and URLhaus. Verified with 39/39 offline unit tests.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn" href="../lab/shadow-xray-demo/">Open Live HTML Audit Demo</a>
+        <a class="btn ghost" href="https://github.com/devonmvfisher" target="_blank" rel="noopener">GitHub Profile</a>
+      </div>
+    </div>
+
+    <div class="term">
+      <div class="term-bar"><span>shadow-xray v0.8.0 ~ quick-start</span><span>39 / 39 unit tests passing</span></div>
+      <div class="term-body">
+        <div class="term-row"><span class="p">$</span> python -m shadow_xray scan ./app --profile oss --html report.html --md report.md</div>
+        <div class="term-row"><span class="p">$</span> python -m shadow_xray predator ./targets --md scoreboard.md <span class="c"># batch + untouched siblings + alien leads</span></div>
+        <div class="term-row"><span class="p">$</span> python -m shadow_xray git-sweep ./repo --commits 25 <span class="c"># mine security fixes for unpatched sibling files</span></div>
+        <div class="term-row"><span class="p">$</span> python -m shadow_xray feed-check --domain example-phish.test <span class="c"># OpenPhish + MetaMask + ScamSniffer + URLhaus</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="case-h">
+    <p class="eyebrow">Public Threat-Intel Case Study (Nov 2026)</p>
+    <h2 class="sec-h" id="case-h">Disrupting a 5-Hop Cloaked GitHub Infostealer Campaign</h2>
+    <div class="grid-2">
+      <article class="card">
+        <span class="card-num">Investigation &amp; Cloaking Discovery</span>
+        <h3>70+ Fake GitHub Orgs &amp; Keitaro TDS Cloaking</h3>
+        <p>Mapped an active Windows infostealer distribution network impersonating Proton VPN, GTA 6, NordVPN, FabFilter, and game utilities across 70+ fake GitHub organizations and expired registrar domains pointed at a single Cloudzy VPS (104.194.148.8).</p>
+        <p>Caught a User-Agent cloaking layer returning fake 404 pages to headless security scanners while redirecting Windows browsers through Base64 GitHub Pages hoppers into live payload delivery, linked to a 10.5K+ USDT Tron payout tree.</p>
+      </article>
+      <article class="card">
+        <span class="card-num">Verified Defensive Outcomes</span>
+        <h3>Public IOCs &amp; Coordinated Takedowns</h3>
+        <p>Published 15+ net-new malicious URLs and redirectors directly to abuse.ch URLhaus and delivered verifiable evidence packages to GitHub Trust &amp; Safety, registrar abuse desks, and hosting providers.</p>
+        <p>Result: 12 confirmed removals across GitHub, Hostinger, and Cloudflare, plus live registrar review escalations. Zero offensive interaction; 100% passive OSINT and cleanroom header analysis.</p>
+        <div class="card-foot">
+          <a class="btn ghost sm" href="https://urlhaus.abuse.ch/" target="_blank" rel="noopener">abuse.ch URLhaus</a>
+          <a class="btn sm" href="../services/#contact">Request Threat-Intel Work</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="repos-h">
+    <p class="eyebrow">Public Verification Repositories</p>
+    <h2 class="sec-h" id="repos-h">Tools That Check AI Work</h2>
+    <div class="grid-2">
+      <article class="card">
+        <span class="card-num">Python Stdlib &middot; 574 Passing Tests</span>
+        <h3>patient-zero</h3>
+        <p>Traces how words, claims, and names spread across multi-agent logs, then explicitly measures what its own detector can and cannot prove against null baselines. Dual licensed MIT / Apache-2.0.</p>
+        <div class="card-foot"><a class="btn ghost sm" href="https://github.com/devonmvfisher/patient-zero" target="_blank" rel="noopener">Open Repository</a></div>
+      </article>
+      <article class="card">
+        <span class="card-num">Live Cloud Agent &middot; 41/41 Tests &middot; 644+ Runs</span>
+        <h3>Sextant (metac-bot-template)</h3>
+        <p>Autonomous forecasting agent running unattended in the Metaculus Fall 2026 AI tournament on GitHub Actions, hardened with strict spending caps, duplicate-run locks, health alerts, and calibration checks.</p>
+        <div class="card-foot"><a class="btn ghost sm" href="https://github.com/devonmvfisher/metac-bot-template" target="_blank" rel="noopener">Open Repository</a></div>
+      </article>
+      <article class="card">
+        <span class="card-num">Node + Python &middot; 24/24 Tests</span>
+        <h3>session-counter</h3>
+        <p>Zero-install CLI to recount failed requests, watchdog kills, give-ups, and dropped subagents directly from your own local Claude Code session logs. Counts only; leaves your machine nowhere.</p>
+        <div class="card-foot"><a class="btn ghost sm" href="https://github.com/devonmvfisher/session-counter" target="_blank" rel="noopener">Open Repository</a></div>
+      </article>
+      <article class="card">
+        <span class="card-num">Empirical Audit &middot; 60+ Documented Faults</span>
+        <h3>field-report-2026</h3>
+        <p>Evidence-backed field report documenting 60+ recurring faults, watchdog limits, and reliability patterns from real Windows multi-agent runs, paired with full reproduction methodology.</p>
+        <div class="card-foot"><a class="btn ghost sm" href="https://github.com/devonmvfisher/field-report-2026" target="_blank" rel="noopener">Read Field Report</a></div>
+      </article>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+      <span class="card-num">Cleanroom &amp; Coordinated Disclosure Guardrails</span>
+      <h3>Non-Negotiable Research Ethics</h3>
+      <p>All vulnerability research is conducted strictly inside public open-source codebases or explicit written bug bounty scopes under coordinated disclosure. No unpatched vendor details are published here, no DRM/encryption is bypassed, and all outputs automatically mask secret literals.</p>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <span><strong>Passage</strong> &middot; Devon Fisher &middot; Powerview, Manitoba, Canada</span>
+      <div class="foot-links">
+        <a href="mailto:devon@passageapp.ca">devon@passageapp.ca</a>
+        <a href="https://github.com/devonmvfisher" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/devonmvfisher/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://x.com/Devon8zzh" target="_blank" rel="noopener">@Devon8zzh on X</a>
+        <a href="https://buymeacoffee.com/devon8zzh" target="_blank" rel="noopener">Buy Me a Coffee</a>
+        <a href="../llms.txt">llms.txt</a>
+        <a href="../index.json">index.json</a>
+      </div>
+    </div>
+    <p class="foot-credit">Code MIT unless noted. Built by Devon Fisher with AI coding and verification agents. Planet maps in Vesper: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>).</p>
+  </div>
+</footer>
+</body>
+</html>

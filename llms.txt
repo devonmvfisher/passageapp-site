@@ -1,0 +1,35 @@
+# Passage (https://passageapp.ca/)
+> One-founder security tooling, AI agent verification, and playable browser worlds studio by Devon Fisher (Powerview, Manitoba, Canada).
+
+## Core Doors
+- Home Hub: https://passageapp.ca/
+- Security & Threat Intel: https://passageapp.ca/security/
+- Services, Hiring & Support: https://passageapp.ca/services/
+- Interactive Lab & Free Kits: https://passageapp.ca/lab/
+- Worlds & Film Studio: https://passageapp.ca/studio/
+- Structured JSON Index: https://passageapp.ca/index.json
+
+## Availability & Paid Services
+- Employment: Open immediately for Remote Canada / Global roles (Threat Intelligence, Application Security, AI Agent Foundations, Trust & Safety). Canadian citizen; no sponsorship required.
+- Offer 1: AI Agent & Workflow Verification Harness Audit (budget caps, silent-failure tests, tool-call boundary checks).
+- Offer 2: Pre-Flight App Store / Play / Web Supply-Chain Security MRI powered by shadow-xray v0.8.0.
+- Offer 3: Custom Threat-Intel & Passive Abuse Monitoring Pipelines.
+- Contact: devon@passageapp.ca | https://www.linkedin.com/in/devonmvfisher/ | https://github.com/devonmvfisher | https://x.com/Devon8zzh
+- Support: https://buymeacoffee.com/devon8zzh
+
+## Public Flagship Tools & Interactive Demos
+- shadow-xray v0.8.0 (Python 3.10+ stdlib-only AST/JS taint scanner, mobile MRI, passive threat-intel watchdog, 39/39 unit tests)
+- Live Shadow X-Ray Demo Report: https://passageapp.ca/lab/shadow-xray-demo/
+- AI Setup Periodic Table: https://passageapp.ca/lab/ai-table/
+- Song-to-Video Kit v2 (MIT, two-reader checked): https://passageapp.ca/lab/song-to-video/ (ZIP: https://passageapp.ca/lab/song-to-video/song-to-video-kit-v2.zip)
+- Storyteller Starter Kit (MIT): https://passageapp.ca/lab/storyteller-kit/
+- Little Theatre: https://passageapp.ca/lab/theatre/
+- patient-zero (Python, 574 passing tests): https://github.com/devonmvfisher/patient-zero
+- Sextant / metac-bot-template (GitHub Actions forecasting bot, 41/41 tests): https://github.com/devonmvfisher/metac-bot-template
+- session-counter (Node & Python, 24/24 tests): https://github.com/devonmvfisher/session-counter
+- field-report-2026 (60+ documented AI agent faults): https://github.com/devonmvfisher/field-report-2026
+
+## Playable 3D Browser Worlds
+- Vesper: https://devonmvfisher.github.io/vesper/
+- Feel and Be Felt: https://devonmvfisher.github.io/feel-and-be-felt/
+- Alder & Water: https://devonmvfisher.github.io/alder.html

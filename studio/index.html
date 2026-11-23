@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worlds & Film Studio | Passage</title>
+<meta name="description" content="Play three browser-native 3D worlds (Vesper, Feel and Be Felt, Alder & Water), watch 15 short films with stills, and visit Shrimp World.">
+<link rel="canonical" href="https://passageapp.ca/studio/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#090507">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://passageapp.ca/studio/">
+<meta property="og:title" content="Worlds & Film Studio | Passage">
+<meta property="og:description" content="Play three browser-native 3D worlds (Vesper, Feel and Be Felt, Alder & Water), watch 15 short films with stills, and visit Shrimp World.">
+<meta property="og:image" content="https://passageapp.ca/og-poster.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Grenze+Gotisch:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="../index.html" aria-label="Passage Home">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span class="brand-name">Passage</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../security/">Security</a>
+      <a href="../services/">Services &amp; Hire</a>
+      <a href="../lab/">Interactive Lab</a>
+      <a href="../studio/" class="active">Worlds &amp; Studio</a>
+      <a href="../services/#support">Support</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="pill-mono" href="../llms.txt" title="Machine-readable studio index for AI agents">/llms.txt</a>
+      <a class="btn sm" href="../services/#contact">Work With Me</a>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="band">
+    <p class="eyebrow">Door 04 &middot; Myth Side</p>
+    <h1 class="page-h">Worlds &amp; Film Archive</h1>
+    <p class="lead">Three playable browser worlds, 15 short films and trailers posted newest-first, and the Shrimp World chapel.</p>
+
+    <div class="arch playing" id="studio-stage" hidden style="margin-top:24px">
+      <div class="player-panel">
+        <div class="player-bar">
+          <strong class="mono" id="stage-name" style="font-size:13px">Playable World</strong>
+          <div style="display:flex;gap:8px">
+            <a class="btn ghost sm" id="stage-open" href="https://devonmvfisher.github.io/vesper/" target="_blank" rel="noopener">Open Full Page</a>
+            <button class="btn sm" type="button" id="stage-close">Close</button>
+          </div>
+        </div>
+        <div class="player-frame" id="stage-frame"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="worlds" aria-labelledby="w-h">
+    <p class="eyebrow">Playable in Your Browser</p>
+    <h2 class="sec-h" id="w-h">Three Worlds</h2>
+    <div class="grid-3">
+      <article class="media-card">
+        <div class="media-thumb"><img src="../worlds/vesper.jpg" width="640" height="360" alt="Vesper planetarium orbit view"></div>
+        <div class="media-body">
+          <span class="when">World I &middot; Three.js / WebGL</span>
+          <h4>Vesper</h4>
+          <p>Free planetarium and space toy in your browser. Fly a solar system, soft-land, float, or pilot.</p>
+          <div class="links">
+            <button class="btn sm" type="button" data-world="Vesper" data-url="https://devonmvfisher.github.io/vesper/">Play Here</button>
+            <a class="btn ghost sm" href="https://devonmvfisher.github.io/vesper/" target="_blank" rel="noopener">Full Page</a>
+          </div>
+        </div>
+      </article>
+      <article class="media-card">
+        <div class="media-thumb"><img src="../worlds/feel-and-be-felt.jpg" width="640" height="360" alt="Feel and Be Felt Flatland slice"></div>
+        <div class="media-body">
+          <span class="when">World II &middot; Tripothon S1</span>
+          <h4>Feel and Be Felt</h4>
+          <p>An interactive 3D Flatland story: a gift lowered into a plane whose residents feel only the slice crossing their world.</p>
+          <div class="links">
+            <button class="btn sm" type="button" data-world="Feel and Be Felt" data-url="https://devonmvfisher.github.io/feel-and-be-felt/">Play Here</button>
+            <a class="btn ghost sm" href="https://devonmvfisher.github.io/feel-and-be-felt/" target="_blank" rel="noopener">Full Page</a>
+          </div>
+        </div>
+      </article>
+      <article class="media-card">
+        <div class="media-thumb"><img src="../worlds/alder.jpg" width="640" height="360" alt="Alder and Water cottage worktable"></div>
+        <div class="media-body">
+          <span class="when">World III &middot; In Development</span>
+          <h4>Alder &amp; Water</h4>
+          <p>A quiet cottage room in the browser, the opening room of a slice-of-life sim built alongside A Little Room for Mum.</p>
+          <div class="links">
+            <button class="btn sm" type="button" data-world="Alder &amp; Water" data-url="https://devonmvfisher.github.io/alder.html">Play Here</button>
+            <a class="btn ghost sm" href="https://devonmvfisher.github.io/alder.html" target="_blank" rel="noopener">Full Page</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" id="watch" aria-labelledby="f-h">
+    <p class="eyebrow">15 Public Posts &middot; Newest First</p>
+    <h2 class="sec-h" id="f-h">Watch the Reel</h2>
+    <div class="media-grid">
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2109235940283801980" target="_blank" rel="noopener"><img src="../films/first-light.jpg" width="800" height="450" loading="lazy" alt="Still from FIRST LIGHT (trailer)"></a>
+        <div class="media-body">
+          <span class="when">11 Oct 2026</span>
+          <h4>FIRST LIGHT (trailer)</h4>
+          <p>One-minute trailer. A crew on the Moon raises a lamp in the long night.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2109235940283801980" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2109225829591044417" target="_blank" rel="noopener"><img src="../films/lackhorse.jpg" width="800" height="450" loading="lazy" alt="Still from LACKHORSE (trailer)"></a>
+        <div class="media-body">
+          <span class="when">11 Oct 2026</span>
+          <h4>LACKHORSE (trailer)</h4>
+          <p>One-minute trailer. No horse. So he built one.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2109225829591044417" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2109225785999642942" target="_blank" rel="noopener"><img src="../films/morrow-trailer.jpg" width="800" height="450" loading="lazy" alt="Still from MORROW (trailer)"></a>
+        <div class="media-body">
+          <span class="when">11 Oct 2026</span>
+          <h4>MORROW (trailer)</h4>
+          <p>One-minute trailer. They roofed the sky. One stone was left out for the morning.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2109225785999642942" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2109220588015493530" target="_blank" rel="noopener"><div class="media-slate">Gravity Can Wait</div></a>
+        <div class="media-body">
+          <span class="when">11 Oct 2026</span>
+          <h4>Gravity Can Wait</h4>
+          <p>One last load. Then the laundromat forgets gravity.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2109220588015493530" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2109186787570774441" target="_blank" rel="noopener"><div class="media-slate">Mandelbrot Brainrot</div></a>
+        <div class="media-body">
+          <span class="when">11 Oct 2026</span>
+          <h4>Mandelbrot Brainrot</h4>
+          <p>The pool has pools. The shrimp has a bathrobe.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2109186787570774441" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2108866071096881334" target="_blank" rel="noopener"><img src="../films/slackwater-song.jpg" width="800" height="450" loading="lazy" alt="Still from SLACKWATER (the song)"></a>
+        <div class="media-body">
+          <span class="when">10 Oct 2026</span>
+          <h4>SLACKWATER (the song)</h4>
+          <p>The song and its film, made in one night from a frame of the horror short.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2108866071096881334" target="_blank" rel="noopener">Watch on X</a><a href="https://x.com/Devon8zzh/status/2108866111882276891" target="_blank" rel="noopener">Raw cut</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2108866018068357267" target="_blank" rel="noopener"><div class="media-slate">My Shoes Have Other Plans</div></a>
+        <div class="media-body">
+          <span class="when">10 Oct 2026</span>
+          <h4>My Shoes Have Other Plans</h4>
+          <p>Short posted on X.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2108866018068357267" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2108829407305744408" target="_blank" rel="noopener"><img src="../films/slackwater-short.jpg" width="800" height="450" loading="lazy" alt="Still from SLACKWATER (horror short)"></a>
+        <div class="media-body">
+          <span class="when">10 Oct 2026</span>
+          <h4>SLACKWATER (horror short)</h4>
+          <p>One evening the tide went out and did not come back.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2108829407305744408" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2107028767080321190" target="_blank" rel="noopener"><img src="../films/slackwater-oct5.jpg" width="800" height="450" loading="lazy" alt="Still from Slackwater (first post)"></a>
+        <div class="media-body">
+          <span class="when">5 Oct 2026</span>
+          <h4>Slackwater (first post)</h4>
+          <p>The opening SLACKWATER study before the 10 Oct short and song.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2107028767080321190" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2106993084689170662" target="_blank" rel="noopener"><img src="../films/morrow.jpg" width="800" height="450" loading="lazy" alt="Still from MORROW (raw cut)"></a>
+        <div class="media-body">
+          <span class="when">5 Oct 2026</span>
+          <h4>MORROW (raw cut)</h4>
+          <p>Early raw study.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2106993084689170662" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2106984442221015307" target="_blank" rel="noopener"><img src="../films/carthorse.jpg" width="800" height="450" loading="lazy" alt="Still from CARTHORSE (raw cut)"></a>
+        <div class="media-body">
+          <span class="when">5 Oct 2026</span>
+          <h4>CARTHORSE (raw cut)</h4>
+          <p>Early raw study.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2106984442221015307" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2106026998321783061" target="_blank" rel="noopener"><img src="../films/hadalis.jpg" width="800" height="450" loading="lazy" alt="Still from HADALIS"></a>
+        <div class="media-body">
+          <span class="when">2 Oct 2026</span>
+          <h4>HADALIS</h4>
+          <p>Spec ad: sparkling water from the bottom of the sea.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2106026998321783061" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2105645977747202112" target="_blank" rel="noopener"><img src="../films/blue-hour.jpg" width="800" height="450" loading="lazy" alt="Still from Blue Hour: Before The Bloom"></a>
+        <div class="media-body">
+          <span class="when">1 Oct 2026</span>
+          <h4>Blue Hour: Before The Bloom</h4>
+          <p>v2 Slop Remastered.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2105645977747202112" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2105555371524079780" target="_blank" rel="noopener"><img src="../films/keel.jpg" width="800" height="450" loading="lazy" alt="Still from KEEL"></a>
+        <div class="media-body">
+          <span class="when">1 Oct 2026</span>
+          <h4>KEEL</h4>
+          <p>Spec ad for a fictional brand: a flask, hot for 24 hours.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2105555371524079780" target="_blank" rel="noopener">Watch on X</a><a href="https://x.com/Devon8zzh/status/2105569639598334354" target="_blank" rel="noopener">Alternate cut</a></div>
+        </div>
+      </article>
+      <article class="media-card">
+        <a class="media-thumb" href="https://x.com/Devon8zzh/status/2105545662444323295" target="_blank" rel="noopener"><img src="../films/claimed.jpg" width="800" height="450" loading="lazy" alt="Still from CLAIMED"></a>
+        <div class="media-body">
+          <span class="when">1 Oct 2026</span>
+          <h4>CLAIMED</h4>
+          <p>Spec ad for a fictional brand: tamper-evident lunch seals.</p>
+          <div class="links"><a href="https://x.com/Devon8zzh/status/2105545662444323295" target="_blank" rel="noopener">Watch on X</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" id="shrimp" aria-labelledby="sh-h">
+    <p class="eyebrow">The Playful Corner</p>
+    <h2 class="sec-h" id="sh-h">Shrimp World</h2>
+    <div class="grid-2">
+      <article class="card">
+        <span class="card-num">5:37 Music Film &middot; Pinned on X</span>
+        <h3>WRONG WORLD, RIGHT RIDE</h3>
+        <p>A full isekai shrimp music film: a courier, a princess, and a ruby-winged shrimp. Built with the same workflow documented in our free Song-to-Video Kit.</p>
+        <div class="card-foot">
+          <a class="btn sm" href="https://x.com/Devon8zzh" target="_blank" rel="noopener">Watch on @Devon8zzh</a>
+          <a class="btn ghost sm" href="../lab/song-to-video/">See How It Was Made</a>
+        </div>
+      </article>
+      <article class="card">
+        <span class="card-num">Original Cult Lore</span>
+        <h3>Mandelbrot Brainrot</h3>
+        <p>The pool has pools. The shrimp has a bathrobe. Honest experimental fun running alongside the serious security work.</p>
+        <div class="card-foot"><a class="btn ghost sm" href="https://x.com/Devon8zzh/status/2109186787570774441" target="_blank" rel="noopener">Watch on X</a></div>
+      </article>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <span><strong>Passage</strong> &middot; Devon Fisher &middot; Powerview, Manitoba, Canada</span>
+      <div class="foot-links">
+        <a href="mailto:devon@passageapp.ca">devon@passageapp.ca</a>
+        <a href="https://github.com/devonmvfisher" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/devonmvfisher/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://x.com/Devon8zzh" target="_blank" rel="noopener">@Devon8zzh on X</a>
+        <a href="https://buymeacoffee.com/devon8zzh" target="_blank" rel="noopener">Buy Me a Coffee</a>
+        <a href="../llms.txt">llms.txt</a>
+        <a href="../index.json">index.json</a>
+      </div>
+    </div>
+    <p class="foot-credit">Code MIT unless noted. Built by Devon Fisher with AI coding and verification agents. Planet maps in Vesper: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>).</p>
+  </div>
+</footer>
+<script>
+(() => {
+  const stage = document.getElementById('studio-stage');
+  const host = document.getElementById('stage-frame');
+  const nameEl = document.getElementById('stage-name');
+  const openEl = document.getElementById('stage-open');
+  const closeBtn = document.getElementById('stage-close');
+  let frame = null;
+  document.querySelectorAll('[data-world]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const url = btn.dataset.url;
+      const title = btn.dataset.world;
+      if (!frame) {
+        frame = document.createElement('iframe');
+        frame.allow = 'fullscreen';
+        host.appendChild(frame);
+      }
+      frame.src = url;
+      frame.title = title + ' playable world';
+      nameEl.textContent = title + ' (Live)';
+      openEl.href = url;
+      stage.hidden = false;
+      stage.scrollIntoView({ behavior:'smooth', block:'start' });
+      closeBtn.focus();
+    });
+  });
+  function close() {
+    if (frame) { frame.remove(); frame = null; }
+    stage.hidden = true;
+  }
+  closeBtn.addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && frame) close(); });
+})();
+</script>
+</body>
+</html>

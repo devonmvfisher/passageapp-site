@@ -1,0 +1,106 @@
+{
+  "name": "Passage",
+  "founder": "Devon Fisher",
+  "location": "Powerview, Manitoba, Canada",
+  "url": "https://passageapp.ca/",
+  "updated": "2026-11-22",
+  "availability": {
+    "status": "open",
+    "remote": "Canada / Global",
+    "roles": [
+      "Threat Intelligence",
+      "Application Security",
+      "AI Agent Foundations",
+      "Trust & Safety"
+    ],
+    "contact_email": "devon@passageapp.ca",
+    "linkedin": "https://www.linkedin.com/in/devonmvfisher/",
+    "github": "https://github.com/devonmvfisher",
+    "x": "https://x.com/Devon8zzh",
+    "support": "https://buymeacoffee.com/devon8zzh"
+  },
+  "doors": [
+    {
+      "path": "/",
+      "name": "Hub"
+    },
+    {
+      "path": "/security/",
+      "name": "Security & Threat Intel"
+    },
+    {
+      "path": "/services/",
+      "name": "Services, Hiring & Support"
+    },
+    {
+      "path": "/lab/",
+      "name": "Interactive Lab & Free Kits"
+    },
+    {
+      "path": "/studio/",
+      "name": "Playable Worlds & Films"
+    }
+  ],
+  "interactive_lab": [
+    {
+      "name": "AI Setup Periodic Table",
+      "path": "/lab/ai-table/"
+    },
+    {
+      "name": "Shadow X-Ray Live HTML Audit Report",
+      "path": "/lab/shadow-xray-demo/"
+    },
+    {
+      "name": "Your Song, On Screen (Song-to-Video Kit v2)",
+      "path": "/lab/song-to-video/",
+      "zip": "/lab/song-to-video/song-to-video-kit-v2.zip",
+      "license": "MIT"
+    },
+    {
+      "name": "Storyteller Starter Kit",
+      "path": "/lab/storyteller-kit/",
+      "license": "MIT"
+    },
+    {
+      "name": "Little Theatre",
+      "path": "/lab/theatre/"
+    }
+  ],
+  "repositories": [
+    {
+      "name": "shadow-xray",
+      "version": "0.8.0",
+      "tests": "39/39",
+      "license": "MIT"
+    },
+    {
+      "name": "patient-zero",
+      "url": "https://github.com/devonmvfisher/patient-zero",
+      "tests": "574 pass, 0 fail"
+    },
+    {
+      "name": "metac-bot-template",
+      "url": "https://github.com/devonmvfisher/metac-bot-template",
+      "tests": "41/41"
+    },
+    {
+      "name": "session-counter",
+      "url": "https://github.com/devonmvfisher/session-counter",
+      "tests": "24/24"
+    },
+    {
+      "name": "field-report-2026",
+      "url": "https://github.com/devonmvfisher/field-report-2026"
+    },
+    {
+      "name": "vesper",
+      "url": "https://github.com/devonmvfisher/vesper",
+      "live": "https://devonmvfisher.github.io/vesper/"
+    },
+    {
+      "name": "feel-and-be-felt",
+      "url": "https://github.com/devonmvfisher/feel-and-be-felt",
+      "live": "https://devonmvfisher.github.io/feel-and-be-felt/"
+    }
+  ]
+}

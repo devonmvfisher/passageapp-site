@@ -3,582 +3,248 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Passage</title>
-<meta name="description" content="Playable worlds, and small tools that check AI work.">
+<title>Passage | Security Tooling, AI Agent Verification & Playable Worlds</title>
+<meta name="description" content="One-founder studio by Devon Fisher in Manitoba. Static AST/taint security tools, live malware takedowns, interactive AI kits, and playable browser worlds.">
+<link rel="canonical" href="https://passageapp.ca/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#090507">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://passageapp.ca/">
-<link rel="canonical" href="https://passageapp.ca/">
-<meta property="og:title" content="Passage">
-<meta property="og:description" content="A one-founder studio in Manitoba. Three worlds to play in your browser, and small tools that check AI work.">
+<meta property="og:title" content="Passage | Security Tooling, AI Agent Verification & Playable Worlds">
+<meta property="og:description" content="One-founder studio by Devon Fisher in Manitoba. Static AST/taint security tools, live malware takedowns, interactive AI kits, and playable browser worlds.">
 <meta property="og:image" content="https://passageapp.ca/og-poster.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A globe inside a gold gothic arch on deep crimson, beside the words Passage: myth on one side, machines on the other.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Passage">
-<meta name="twitter:description" content="A one-founder studio in Manitoba. Three worlds to play in your browser, and small tools that check AI work.">
-<meta name="twitter:image" content="https://passageapp.ca/og-poster.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Grenze+Gotisch:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink:#0a0507; --ink2:#13080b; --wine:#2a070e; --blood:#7d0c1c; --crimson:#b8142d; --crimson2:#d61f3b;
-    --white:#fff6f3; --text:#efe2e2; --dim:#c6adb1; --gold:#d6a85a; --frame:rgba(214,168,90,.55); --rule:rgba(184,20,45,.38);
-  }
-  * { box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { margin:0; background:var(--ink); color:var(--text); font:500 20px/1.5 "Cormorant Garamond", Georgia, serif; font-variant-numeric:lining-nums; overflow-x:hidden; }
-  a { color:var(--white); text-decoration-color:var(--crimson2); text-underline-offset:3px; }
-  a:hover, a:focus-visible { color:#ffd9de; }
-  .wrap { max-width:1040px; margin:0 auto; padding:0 18px; }
-
-  /* The arch: a window onto a real frame of Vesper, gold frame, crimson light */
-  header { position:relative; padding:32px 0 0; text-align:center; isolation:isolate; overflow-x:clip; }
-  header::before { content:""; position:absolute; z-index:-1; left:50%; top:-120px; width:min(1500px, 190vw); height:1250px; transform:translateX(-50%);
-          background:radial-gradient(closest-side, rgba(184,20,45,.42), rgba(125,12,28,.18) 55%, rgba(10,5,7,0) 100%); pointer-events:none; }
-  .arch { position:relative; z-index:1; margin:0 auto; width:min(570px, 92vw); aspect-ratio:3/4; border-radius:50% 50% 12px 12px / 34% 34% 12px 12px; overflow:hidden;
-          border:2px solid var(--gold); background:#030203;
-          box-shadow:0 0 0 7px var(--ink), 0 0 0 8px var(--frame), 0 0 70px 6px rgba(184,20,45,.55), 0 40px 160px 10px rgba(184,20,45,.45); }
-  .arch .sky { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
-  .arch .sky { object-fit:cover; object-position:50% 40%; }
-  .arch .veil { position:absolute; inset:0; pointer-events:none;
-          background:linear-gradient(180deg, rgba(60,0,12,.22) 0%, rgba(70,0,14,.10) 36%, rgba(54,0,11,.70) 60%, rgba(26,2,7,.96) 84%); }
-  .arch .tracery { position:absolute; inset:12px 12px 0; border:1px solid var(--frame); border-bottom:0; border-radius:50% 50% 0 0 / 33% 33% 0 0; pointer-events:none;
-          -webkit-mask-image:linear-gradient(180deg, #000 0, #000 45%, transparent 62%); mask-image:linear-gradient(180deg, #000 0, #000 45%, transparent 62%); }
-  .arch .glass { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; pointer-events:none; }
-  .arch .title { position:relative; padding:24px 22px 6.5%; }
-  .arch .title::before { content:""; position:absolute; top:0; left:7%; right:7%; height:2px;
-          background:linear-gradient(90deg, transparent, var(--frame) 18%, var(--frame) 82%, transparent); }
-  h1 { margin:0; font:900 clamp(70px, 18vw, 150px)/.86 "Grenze Gotisch", "Cormorant Garamond", serif; color:var(--white);
-       text-shadow:0 0 28px rgba(214,31,59,.75), 0 0 2px rgba(0,0,0,.9), 0 6px 26px rgba(0,0,0,.6); }
-  .tag { margin:12px auto 16px; max-width:34ch; color:var(--white); font-size:clamp(19px, 2.6vw, 22px); line-height:1.35; text-shadow:0 1px 8px #000; }
-  .sub { margin:-8px auto 16px; max-width:38ch; color:var(--text); font-size:clamp(17px, 2.2vw, 19px); line-height:1.35; text-shadow:0 1px 8px #000; }
-  .arch .title .btn { pointer-events:auto; }
-  .arch.playing { width:100%; aspect-ratio:auto; height:min(820px, calc(100vh - 64px)); height:min(820px, calc(100dvh - 64px)); min-height:280px; border-radius:4px; overflow:visible; text-align:left; }
-  .arch.playing > .sky, .arch.playing > .veil, .arch.playing > .glass, .arch.playing > .tracery, .arch.playing > .hero-image-fallback { display:none; }
-  .hero-image-fallback { position:absolute; top:16%; left:10%; right:10%; margin:0; color:var(--text); font:600 18px/1.35 "Cormorant Garamond", Georgia, serif; text-align:center; }
-  .player-panel { height:100%; min-height:0; display:grid; grid-template-rows:auto auto auto minmax(0, 1fr); background:var(--ink); border-radius:2px; }
-  .player-panel[hidden] { display:none; }
-  .player-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; padding:10px 12px; border-bottom:1px solid var(--rule); }
-  .player-name { margin:0; min-width:0; overflow-wrap:anywhere; font:700 23px/1.2 "Cormorant Garamond", Georgia, serif; }
-  .player-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-  .player-actions .btn { padding:10px 12px; font-size:17px; }
-  .player-actions .btn:disabled { opacity:.65; cursor:wait; }
-  .player-hint, .player-status { margin:0; padding:6px 12px; font:500 16px/1.3 "Cormorant Garamond", Georgia, serif; color:var(--dim); }
-  .player-hint { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; }
-  .player-hint[hidden] { display:none; }
-  .hint-dismiss { padding:0; border:0; color:var(--white); background:none; font:inherit; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
-  .hint-dismiss:focus-visible { outline:2px solid var(--white); outline-offset:3px; }
-  .player-status { color:var(--white); }
-  .player-status[hidden] { display:none; }
-  .player-frame { grid-row:4; position:relative; min-width:0; min-height:0; background:#000; }
-  .player-frame iframe { display:block; width:100%; height:100%; position:absolute; inset:0; border:0; border-radius:0; }
-  .arch:fullscreen { width:100%; height:100%; min-height:0; max-width:none; margin:0; border:0; border-radius:0; box-shadow:none; background:var(--ink); padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-  .arch::backdrop { background:var(--ink); }
-  header.world-open .spill { display:none; }
-  .sky { overflow:hidden; font-size:13px; line-height:1.3; color:transparent; }
-  .caption { position:relative; z-index:1; margin:16px 0 0; color:var(--dim); font-size:16px; }
-  .arch.playing + .caption { visibility:hidden; }
-  .spill { position:absolute; z-index:0; left:50%; top:calc(32px + min(570px, 92vw) * 4 / 3 - 30px); width:min(1100px, 150vw); height:420px; transform:translateX(-50%);
-          background:linear-gradient(180deg, rgba(184,20,45,.40), rgba(125,12,28,.12) 55%, rgba(10,5,7,0));
-          clip-path:polygon(28% 0, 72% 0, 100% 100%, 0 100%); filter:blur(22px); pointer-events:none; }
-
-  .btn { display:inline-block; font:700 18px/1 "Cormorant Garamond", Georgia, serif; color:var(--white); background:var(--crimson);
-         border:1px solid var(--crimson2); border-radius:3px; padding:12px 18px 13px; cursor:pointer; text-decoration:none; }
-  .btn:hover, .btn:focus-visible { background:var(--crimson2); color:var(--white); outline:2px solid var(--white); outline-offset:2px; }
-  .btn.ghost { background:transparent; }
-  .btn.ghost:hover, .btn.ghost:focus-visible { background:rgba(184,20,45,.22); }
-
-  main { position:relative; z-index:1; }
-  section { padding:44px 0 0; }
-  h2 { margin:0; font:700 clamp(40px, 5.6vw, 56px)/1 "Grenze Gotisch", "Cormorant Garamond", serif; color:var(--white); }
-  .lede { margin:6px 0 18px; font-size:clamp(20px, 2.6vw, 24px); color:var(--dim); }
-
-  .worlds { list-style:none; margin:0; padding:0; border-bottom:1px solid var(--rule); }
-  .world { display:grid; grid-template-columns:84px 1fr auto; gap:6px 24px; align-items:center; padding:16px 0; border-top:1px solid var(--rule); }
-  .world .num { font:700 56px/1 "Cormorant Garamond", Georgia, serif; color:var(--crimson2); text-align:center; text-shadow:0 0 22px rgba(184,20,45,.5); }
-  .world h3 { margin:0 0 2px; font:700 34px/1.1 "Cormorant Garamond", Georgia, serif; color:var(--white); }
-  .world p { margin:0; max-width:54ch; }
-  .nw { white-space:nowrap; }
-  .world .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-
-  .term { background:#0d0608; border:1px solid var(--rule); border-radius:4px; overflow:hidden; }
-  .term .bar { padding:8px 14px; background:#170a0d; font:400 13px "JetBrains Mono", monospace; color:var(--dim); border-bottom:1px solid var(--rule); }
-  .term .body { padding:14px 16px 2px; font:15px/1.55 "JetBrains Mono", monospace; color:#f3e9ea; }
-  .term .p { color:var(--crimson2); }
-  .term .entry { margin:0 0 14px; }
-  .term .note { color:var(--dim); }
-
-  .next { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; margin:20px 0 0; }
-  .next h3 { margin:0; font:700 clamp(30px, 3.6vw, 36px)/1 "Grenze Gotisch", "Cormorant Garamond", serif; color:var(--white); }
-  .next ul { list-style:none; margin:0 0 0 auto; padding:0; display:flex; flex-wrap:wrap; gap:10px; }
-
-  .reel { position:relative; list-style:none; margin:0; padding:0; }
-  .reel::before { content:""; position:absolute; top:8px; bottom:8px; left:150px; width:1px; background:linear-gradient(180deg, var(--crimson2), var(--rule) 60%, rgba(184,20,45,.12)); }
-  .film { position:relative; display:grid; grid-template-columns:126px minmax(0, 1fr); gap:0 48px; align-items:start; padding:8px 0; }
-  .film::before { content:""; position:absolute; left:146px; top:26px; width:9px; height:9px; transform:rotate(45deg); background:var(--ink); border:1px solid var(--gold); }
-  .film .when { margin-top:8px; font:400 13px/1.5 "JetBrains Mono", monospace; color:var(--dim); text-align:right; }
-  .film .when time { display:block; }
-  .film .card { min-width:0; padding:16px 20px; background:#0d0608; border:1px solid var(--rule); border-radius:4px; }
-  .film h3 { margin:0; overflow-wrap:anywhere; font:700 28px/1.15 "Cormorant Garamond", Georgia, serif; color:var(--white); }
-  .film .film-note { margin:6px 0 0; color:var(--dim); font-size:17px; line-height:1.4; }
-  .film .film-links { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 20px; margin:12px 0 0; font-size:18px; }
-  .film .variant { font-size:16px; }
-
-  .evidence-note { margin-top:22px; padding:16px 0 0; border-top:1px solid var(--rule); max-width:70ch; }
-  .evidence-note h3 { margin:0 0 8px; font:700 28px/1.15 "Cormorant Garamond", Georgia, serif; color:var(--white); }
-  .evidence-note p { margin:0 0 10px; }
-  .evidence-note .evidence-links { display:flex; gap:10px 22px; flex-wrap:wrap; }
-  .kit-status { margin:18px 0 0; color:var(--dim); font-size:18px; }
-  .support { margin:36px 0 0; color:var(--dim); font-size:18px; }
-
-  footer { margin:44px 0 0; padding:18px 0 30px; border-top:1px solid var(--rule); color:var(--dim); font-size:17px; }
-  footer .wrap { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-  footer .credit { flex:1 1 100%; font-size:16px; }
-
-  @media (max-width:700px) {
-    .next ul { margin-left:0; }
-    .reel::before { left:4px; }
-    .film { grid-template-columns:minmax(0, 1fr); gap:6px; padding:8px 0 8px 26px; }
-    .film::before { left:0; top:15px; }
-    .film .when { margin:0; text-align:left; }
-    .film .when time { display:inline; }
-    .film .card { padding:14px 16px; }
-    .world { grid-template-columns:52px 1fr; }
-    .world .num { font-size:44px; }
-    .world .row { grid-column:1 / -1; justify-content:flex-start; padding-left:78px; }
-  }
-  @media (max-width:420px) { .world .row { padding-left:0; } }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Grenze+Gotisch:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <div class="arch" id="arch">
-      <img class="sky" id="hero-art" src="hero-vesper-arch.jpg" width="1050" height="1400" alt="A frame from Vesper: the Earth from orbit, with satellites, in a field of stars.">
-      <p class="hero-image-fallback" id="hero-image-fallback" aria-hidden="true" hidden>Preview image unavailable.</p>
-      <div class="veil" aria-hidden="true"></div>
-      <div class="tracery" aria-hidden="true"></div>
-      <div class="glass">
-        <div class="title">
-          <h1>Passage</h1>
-          <p class="tag">A one-founder studio in Manitoba. Myth on one side, machines on the other.</p>
-          <p class="sub">We build small worlds with AI agents, and we build the tools that keep those agents honest.</p>
-          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/vesper/">Play Vesper here</button>
-        </div>
-      </div>
-      <div class="player-panel" id="player-panel" hidden>
-        <div class="player-toolbar">
-          <p class="player-name" id="player-name">Playable world</p>
-          <div class="player-actions" role="group" aria-label="World controls">
-            <button class="btn ghost" id="fullscreen" type="button" aria-pressed="false">Full screen</button>
-            <a class="btn ghost" id="player-open" href="https://devonmvfisher.github.io/vesper/" target="_blank" rel="noopener">Open full page</a>
-            <button class="btn" id="closer" type="button" aria-label="Close the window">Close</button>
-          </div>
-        </div>
-        <div class="player-hint" id="player-hint"><span>On a slow connection, the world may take time to appear. Full screen keeps this session; Open full page starts a separate session.</span><button class="hint-dismiss" id="hide-player-hint" type="button">Hide tip</button></div>
-        <p class="player-status" id="player-status" role="status" aria-live="polite" hidden></p>
-        <div class="player-frame" id="player-frame"></div>
-      </div>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html" aria-label="Passage Home">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span class="brand-name">Passage</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="security/">Security</a>
+      <a href="services/">Services &amp; Hire</a>
+      <a href="lab/">Interactive Lab</a>
+      <a href="studio/">Worlds &amp; Studio</a>
+      <a href="services/#support">Support</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="pill-mono" href="llms.txt" title="Machine-readable studio index for AI agents">/llms.txt</a>
+      <a class="btn sm" href="services/#contact">Work With Me</a>
     </div>
-    <p class="caption" id="arch-caption" role="status" aria-live="polite">In the window: a frame from Vesper, World I below.</p>
   </div>
-  <div class="spill" aria-hidden="true"></div>
 </header>
 
-<main class="wrap">
-  <section id="worlds" aria-labelledby="worlds-h">
-    <h2 id="worlds-h">Enter a world</h2>
-    <p class="lede">Three you can play here, in the window.</p>
-    <ol class="worlds">
-      <li class="world">
-        <span class="num" aria-hidden="true">I</span>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid" id="hero-grid">
         <div>
-          <h3>Vesper</h3>
-          <p>A free planetarium and space toy in your browser. Fly a solar system, soft-land, float or pilot.</p>
+          <div class="status-pill"><span class="status-dot" aria-hidden="true"></span>Open to Remote Roles (Canada / Global) &middot; Fixed-Scope Audits Available</div>
+          <p class="eyebrow">Manitoba, Canada &middot; Myth on One Side, Machines on the Other</p>
+          <h1 class="display">Passage</h1>
+          <p class="lead">Autonomous security tooling, AI agent verification harnesses, interactive guides, and playable browser worlds built by Devon Fisher.</p>
+          <p class="hero-sub">AI coding agents write most of the code; I design the architecture, set the threat model, run independent checker loops, and ship only what passes cold tests.</p>
+          <div class="hero-actions">
+            <a class="btn" href="security/">Security &amp; Tools</a>
+            <a class="btn ghost" href="services/">Hire / Services</a>
+            <a class="btn ghost" href="lab/">Open Interactive Lab</a>
+            <a class="btn ghost" href="studio/">Worlds &amp; Films</a>
+          </div>
         </div>
-        <div class="row">
-          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/vesper/">Play in the window</button>
-          <a class="btn ghost" href="https://devonmvfisher.github.io/vesper/" target="_blank" rel="noopener">Open full page</a>
-        </div>
-      </li>
-      <li class="world">
-        <span class="num" aria-hidden="true">II</span>
-        <div>
-          <h3>Feel and Be Felt</h3>
-          <p>One of our three Tripothon S1 entries. A gift lowered into a Flatland whose people feel only the slice in their plane.</p>
-        </div>
-        <div class="row">
-          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/feel-and-be-felt/">Play in the window</button>
-          <a class="btn ghost" href="https://devonmvfisher.github.io/feel-and-be-felt/" target="_blank" rel="noopener">Open full page</a>
-        </div>
-      </li>
-      <li class="world">
-        <span class="num" aria-hidden="true">III</span>
-        <div>
-          <h3>Alder &amp; Water</h3>
-          <p>A little cottage room in the browser, the first room of a <span class="nw">slice-of-life</span> sim. In development.</p>
-        </div>
-        <div class="row">
-          <button class="btn" type="button" data-play="https://devonmvfisher.github.io/alder.html">Play in the window</button>
-          <a class="btn ghost" href="https://devonmvfisher.github.io/alder.html" target="_blank" rel="noopener">Open full page</a>
-        </div>
-      </li>
-    </ol>
-  </section>
 
-  <nav class="next" aria-labelledby="next-h">
-    <h3 id="next-h">What next</h3>
-    <ul>
-      <li><a class="btn ghost" href="https://x.com/Devon8zzh">Follow on X</a></li>
-    </ul>
-  </nav>
+        <div class="arch" id="arch">
+          <img class="sky" src="hero-vesper-arch.jpg" width="1050" height="1400" alt="Vesper orbital planetarium frame inside a gold gothic arch">
+          <div class="veil" aria-hidden="true"></div>
+          <div class="tracery" aria-hidden="true"></div>
+          <div class="glass">
+            <p class="arch-kicker">Live Browser World</p>
+            <p class="arch-title">Vesper</p>
+            <p class="arch-note">Free planetarium and space toy. Fly, orbit, and land right inside this window.</p>
+            <div>
+              <button class="btn sm" type="button" id="play-vesper">Play Vesper Here</button>
+            </div>
+          </div>
+          <div class="player-panel" id="player-panel" hidden>
+            <div class="player-bar">
+              <strong class="mono" style="font-size:13px">Vesper (Live)</strong>
+              <div style="display:flex;gap:8px">
+                <a class="btn ghost sm" href="https://devonmvfisher.github.io/vesper/" target="_blank" rel="noopener">Full Tab</a>
+                <button class="btn sm" type="button" id="close-vesper">Close</button>
+              </div>
+            </div>
+            <div class="player-frame" id="player-frame"></div>
+          </div>
+        </div>
+      </div>
 
-  <section id="watch" aria-labelledby="watch-h">
-    <h2 id="watch-h">Watch</h2>
-    <p class="lede">Films and versions, in order of their public posts. Dates are the posted dates in Central time.</p>
-    <ol class="reel">
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-01">1 Oct 2026</time></div>
-        <div class="card">
-          <h3>CLAIMED</h3>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2105545662444323295" aria-label="Watch CLAIMED on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-01">1 Oct 2026</time></div>
-        <div class="card">
-          <h3>KEEL</h3>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2105555371524079780" aria-label="Watch KEEL on X">Watch on X</a> <a class="variant" href="https://x.com/Devon8zzh/status/2105569639598334354" aria-label="Watch the KEEL alternate cut on X">Alternate cut on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-01">1 Oct 2026</time></div>
-        <div class="card">
-          <h3>Blue Hour - Before The Bloom v2 Slop Remastered</h3>
-          <p class="film-note">Remastered version.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2105645977747202112" aria-label="Watch Blue Hour - Before The Bloom v2 Slop Remastered on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-02">2 Oct 2026</time></div>
-        <div class="card">
-          <h3>HADALIS</h3>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2106026998321783061" aria-label="Watch HADALIS on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-05">5 Oct 2026</time></div>
-        <div class="card">
-          <h3>CARTHORSE</h3>
-          <p class="film-note">Raw version.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2106984442221015307" aria-label="Watch CARTHORSE on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-05">5 Oct 2026</time></div>
-        <div class="card">
-          <h3>MORROW</h3>
-          <p class="film-note">Raw version.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2106993084689170662" aria-label="Watch MORROW on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-05">5 Oct 2026</time></div>
-        <div class="card">
-          <h3>Slackwater</h3>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2107028767080321190" aria-label="Watch Slackwater on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-10">10 Oct 2026</time></div>
-        <div class="card">
-          <h3>SLACKWATER</h3>
-          <p class="film-note">The horror short. One evening the tide went out and did not come back.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2108829407305744408" aria-label="Watch the SLACKWATER horror short on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-10">10 Oct 2026</time></div>
-        <div class="card">
-          <h3>My Shoes Have Other Plans</h3>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2108866018068357267" aria-label="Watch My Shoes Have Other Plans on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-10">10 Oct 2026</time></div>
-        <div class="card">
-          <h3>SLACKWATER</h3>
-          <p class="film-note">The song and its film, made in one night from a frame of the short. Two versions: the raw first cut, mistake and all, and the one with four scenes made again.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2108866071096881334" aria-label="Watch SLACKWATER on X">Watch on X</a> <a class="variant" href="https://x.com/Devon8zzh/status/2108866111882276891" aria-label="Watch the raw first cut of SLACKWATER on X">Raw version on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-11">11 Oct 2026</time></div>
-        <div class="card">
-          <h3>Mandelbrot Brainrot</h3>
-          <p class="film-note">The pool has pools. The shrimp has a bathrobe.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2109186787570774441" aria-label="Watch Mandelbrot Brainrot on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-11">11 Oct 2026</time></div>
-        <div class="card">
-          <h3>Gravity Can Wait</h3>
-          <p class="film-note">One last load. Then the laundromat forgets gravity.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2109220588015493530" aria-label="Watch Gravity Can Wait on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-11">11 Oct 2026</time></div>
-        <div class="card">
-          <h3>MORROW (trailer)</h3>
-          <p class="film-note">One-minute trailer. They roofed the sky. One stone was left out for the morning.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2109225785999642942" aria-label="Watch the MORROW trailer on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-11">11 Oct 2026</time></div>
-        <div class="card">
-          <h3>LACKHORSE (trailer)</h3>
-          <p class="film-note">One-minute trailer. No horse. So he built one.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2109225829591044417" aria-label="Watch the LACKHORSE trailer on X">Watch on X</a></p>
-        </div>
-      </li>
-      <li class="film">
-        <div class="when">Posted <time datetime="2026-10-11">11 Oct 2026</time></div>
-        <div class="card">
-          <h3>FIRST LIGHT (trailer)</h3>
-          <p class="film-note">One-minute trailer. A crew on the Moon raises a lamp in the long night.</p>
-          <p class="film-links"><a href="https://x.com/Devon8zzh/status/2109235940283801980" aria-label="Watch the FIRST LIGHT trailer on X">Watch on X</a></p>
-        </div>
-      </li>
-    </ol>
-  </section>
-
-  <section id="tools" aria-labelledby="tools-h">
-    <h2 id="tools-h">The machine side</h2>
-    <p class="lede">Small tools that check AI work.</p>
-    <div class="term">
-      <div class="bar">passage ~ public</div>
-      <div class="body">
-        <div class="entry"><span class="p">$</span> <a href="https://github.com/devonmvfisher/field-report-2026">field-report-2026</a><br>A field report on Claude Code, the Claude desktop app and Claude in Chrome.</div>
-        <div class="entry"><span class="p">$</span> <a href="https://github.com/devonmvfisher/session-counter">session-counter</a><br>Recount failed requests, give-ups, watchdog kills and lost agents in your own Claude Code logs.</div>
-        <div class="entry note"><span class="p">$</span> Glamor v0.8 is in testing.</div>
-        <div class="entry note"><span class="p">$</span> more on the bench: blind frame checks for AI video, cut and loudness checks, quote and clock checks for agent replies. Being prepared for release.</div>
+      <div class="metrics" aria-label="Measured public record">
+        <div class="metric"><b>39 / 39</b><span>shadow-xray v0.8.0 offline unit tests (Python AST + JS/TS taint + threat feeds)</span></div>
+        <div class="metric"><b>70+ orgs</b><span>Fake GitHub infostealer cluster dissected; 15+ URLhaus IOCs &amp; 12 takedowns</span></div>
+        <div class="metric"><b>574 tests</b><span>patient-zero multi-agent diffusion &amp; claim-check suite (0 failures, stdlib Python)</span></div>
+        <div class="metric"><b>5 live apps</b><span>Interactive AI Periodic Table, kits, audit demo &amp; 3 playable 3D browser worlds</span></div>
       </div>
     </div>
-    <aside class="evidence-note" id="law" aria-labelledby="law-h">
-      <h3 id="law-h">Check the work</h3>
-      <p>The <a href="https://github.com/devonmvfisher/field-report-2026">field report</a> covers 61 faults, limits and recurring patterns from one Windows setup. Its method explains the sources, checks and gaps.</p>
-      <p>Want to recount your own sessions? session-counter includes the code and its test cases.</p>
-      <p class="evidence-links"><a href="https://github.com/devonmvfisher/field-report-2026/blob/main/METHOD.md">Read the method</a><a href="https://github.com/devonmvfisher/session-counter">Try session-counter</a></p>
-    </aside>
-    <p class="kit-status" id="kit"><strong>Free kit:</strong> in preparation. It is not available to download yet.</p>
   </section>
-  <p class="support">The worlds are free to play. If you want to help pay for the machines behind them: <a href="https://buymeacoffee.com/devon8zzh">Buy me a coffee</a></p>
+
+  <section class="band" aria-labelledby="doors-h">
+    <div class="wrap">
+      <p class="eyebrow">Four Focused Doors</p>
+      <h2 class="sec-h" id="doors-h">Pick Where You Want to Land</h2>
+      <div class="grid-2">
+        <article class="card">
+          <span class="card-num">Door 01 &middot; Security &amp; Open Source</span>
+          <h3>Security Tooling &amp; Threat Intel</h3>
+          <p>Static AST/taint auditing with shadow-xray v0.8.0, live malware infrastructure disruption receipts, multi-agent verification repos, and responsible disclosure methodology.</p>
+          <div class="tags">
+            <span class="tag-chip red">shadow-xray</span>
+            <span class="tag-chip">patient-zero</span>
+            <span class="tag-chip">URLhaus IOCs</span>
+            <span class="tag-chip">Sextant</span>
+          </div>
+          <div class="card-foot">
+            <a class="btn sm" href="security/">Enter Security</a>
+            <a class="btn ghost sm" href="lab/shadow-xray-demo/">Live Demo Report</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-num">Door 02 &middot; Hiring &amp; Consulting</span>
+          <h3>Services, Hiring &amp; Support</h3>
+          <p>Available for remote Canada/global roles in Threat Intel, AppSec, and AI Agent Foundations, plus three fixed-scope technical audit offers and direct machine support.</p>
+          <div class="tags">
+            <span class="tag-chip gold">Remote Canada</span>
+            <span class="tag-chip">Agent Harnesses</span>
+            <span class="tag-chip">Pre-Flight MRI</span>
+            <span class="tag-chip">MIT Kits</span>
+          </div>
+          <div class="card-foot">
+            <a class="btn sm" href="services/">View Services &amp; Hire</a>
+            <a class="btn ghost sm" href="services/#support">Support / Kits</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-num">Door 03 &middot; Run in Browser</span>
+          <h3>Interactive Lab &amp; Free Kits</h3>
+          <p>Explore the AI Setup Periodic Table, run through the two-reader-checked Song-to-Video Kit (with ZIP download), try the Storyteller Starter Kit, or inspect a live Shadow X-Ray report.</p>
+          <div class="tags">
+            <span class="tag-chip gold">AI Periodic Table</span>
+            <span class="tag-chip">Song-to-Video Kit</span>
+            <span class="tag-chip">Storyteller Kit</span>
+            <span class="tag-chip">Little Theatre</span>
+          </div>
+          <div class="card-foot">
+            <a class="btn sm" href="lab/">Open Interactive Lab</a>
+            <a class="btn ghost sm" href="lab/ai-table/">Launch Periodic Table</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-num">Door 04 &middot; Worlds &amp; Cinema</span>
+          <h3>Playable 3D Worlds &amp; Film Archive</h3>
+          <p>Three browser-native 3D worlds playable right on the page (Vesper, Feel and Be Felt, Alder &amp; Water), 15 short films with frame stills, and the Shrimp World chapel.</p>
+          <div class="tags">
+            <span class="tag-chip">Vesper</span>
+            <span class="tag-chip">Feel and Be Felt</span>
+            <span class="tag-chip">15 Films</span>
+            <span class="tag-chip red">Shrimp World</span>
+          </div>
+          <div class="card-foot">
+            <a class="btn sm" href="studio/">Enter Studio</a>
+            <a class="btn ghost sm" href="https://x.com/Devon8zzh" target="_blank" rel="noopener">@Devon8zzh on X</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="agent-h">
+    <div class="wrap">
+      <p class="eyebrow">For Developers &amp; AI Agents</p>
+      <h2 class="sec-h" id="agent-h">Machine-Readable Proof</h2>
+      <div class="term">
+        <div class="term-bar">
+          <span>passage ~ public-index</span>
+          <span>Zero dependencies &middot; Cold-verified</span>
+        </div>
+        <div class="term-body">
+          <div class="term-row"><span class="p">$</span> curl -s https://passageapp.ca/llms.txt <span class="c"># plain-text studio &amp; services manifest for AI agents</span></div>
+          <div class="term-row"><span class="p">$</span> curl -s https://passageapp.ca/index.json <span class="c"># structured JSON index of repos, tools, kits &amp; worlds</span></div>
+          <div class="term-row"><span class="p">$</span> python -m shadow_xray scan ./repo --profile oss --html audit.html <span class="c"># Python AST + JS/TS taint + threat feeds</span></div>
+          <div class="term-row"><span class="p">$</span> git clone https://github.com/devonmvfisher/patient-zero &amp;&amp; python -m unittest <span class="c"># 574 passing tests</span></div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div>
+          <h3>Hiring for Security, Threat Intel, or AI Agent Reliability?</h3>
+          <p>Based in Manitoba, Canada (Canadian citizen, remote-ready globally). Happy to prove fit on a live repo review, bug triage, or take-home audit.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn" href="mailto:devon@passageapp.ca">Email devon@passageapp.ca</a>
+          <a class="btn ghost" href="https://www.linkedin.com/in/devonmvfisher/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn ghost" href="https://buymeacoffee.com/devon8zzh" target="_blank" rel="noopener">Buy Me a Coffee</a>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <span>Devon Fisher, founder &middot; <a href="mailto:devon@passageapp.ca">devon@passageapp.ca</a> &middot; <a href="https://github.com/devonmvfisher">github.com/devonmvfisher</a> &middot; <a href="https://buymeacoffee.com/devon8zzh">Buy me a coffee</a></span>
-    <span>Passage &middot; Manitoba, Canada &middot; 2026</span>
-    <span class="credit">Earth and planet images in Vesper: <a href="https://www.solarsystemscope.com/textures/">Solar System Scope</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+    <div class="foot-row">
+      <span><strong>Passage</strong> &middot; Devon Fisher &middot; Powerview, Manitoba, Canada</span>
+      <div class="foot-links">
+        <a href="mailto:devon@passageapp.ca">devon@passageapp.ca</a>
+        <a href="https://github.com/devonmvfisher" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/devonmvfisher/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://x.com/Devon8zzh" target="_blank" rel="noopener">@Devon8zzh on X</a>
+        <a href="https://buymeacoffee.com/devon8zzh" target="_blank" rel="noopener">Buy Me a Coffee</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="index.json">index.json</a>
+      </div>
+    </div>
+    <p class="foot-credit">Code MIT unless noted. Built by Devon Fisher with AI coding and verification agents. Planet maps in Vesper: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener">Solar System Scope</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>).</p>
   </div>
 </footer>
-
 <script>
 (() => {
   const arch = document.getElementById('arch');
-  const header = arch.closest('header');
+  const grid = document.getElementById('hero-grid');
   const panel = document.getElementById('player-panel');
   const host = document.getElementById('player-frame');
-  const closer = document.getElementById('closer');
-  const fullscreen = document.getElementById('fullscreen');
-  const fullPage = document.getElementById('player-open');
-  const name = document.getElementById('player-name');
-  const status = document.getElementById('player-status');
-  const hero = document.getElementById('hero-art');
-  const caption = document.getElementById('arch-caption');
-  const imageFallback = document.getElementById('hero-image-fallback');
-  const hint = document.getElementById('player-hint');
-  const hideHint = document.getElementById('hide-player-hint');
-  const normalCaption = caption.textContent;
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const playBtn = document.getElementById('play-vesper');
+  const closeBtn = document.getElementById('close-vesper');
   let frame = null;
-  let activeUrl = '';
-  let opener = null;
-  let session = 0;
-  let pendingFullscreen = false;
-  let exitingFullscreen = false;
-  let wasFullscreen = false;
-  let lastFullscreenExit = -Infinity;
-
-  function ownsFullscreen() {
-    const element = document.fullscreenElement;
-    return !!element && (element === arch || arch.contains(element));
-  }
-  function say(message) {
-    status.textContent = message;
-    status.hidden = !message;
-  }
-  function syncFullscreen() {
-    const active = ownsFullscreen();
-    fullscreen.textContent = active ? 'Exit full screen' : 'Full screen';
-    fullscreen.setAttribute('aria-pressed', String(active));
-    fullscreen.disabled = pendingFullscreen || exitingFullscreen;
-  }
-  function restoreArch() {
-    if (frame || ownsFullscreen()) return;
-    const restoreFocus = !panel.hidden;
-    panel.hidden = true;
-    arch.classList.remove('playing');
-    header.classList.remove('world-open');
-    say('');
-    name.textContent = 'Playable world';
-    syncFullscreen();
-    if (restoreFocus && opener && opener.isConnected) opener.focus();
-  }
-  function showClosedFullscreen() {
-    panel.hidden = false;
-    arch.classList.add('playing');
-    header.classList.add('world-open');
-    name.textContent = 'World closed';
-    say('The world is closed. Press Esc or Exit full screen to return.');
-    syncFullscreen();
-  }
-  async function leaveFullscreen() {
-    if (exitingFullscreen) return;
-    if (!ownsFullscreen()) { restoreArch(); return; }
-    const current = session;
-    exitingFullscreen = true;
-    syncFullscreen();
-    try {
-      await document.exitFullscreen();
-    } catch (_) {
-      if (current === session) {
-        if (!frame) showClosedFullscreen();
-        else say('Could not leave full screen. Press Esc to return to the page.');
-      }
-    } finally {
-      exitingFullscreen = false;
-      syncFullscreen();
-      if (!frame) restoreArch();
-    }
-  }
-  function openWorld(button) {
-    const url = button.dataset.play;
-    const world = button.closest('.world');
-    const title = world ? world.querySelector('h3').textContent : 'Vesper';
-    opener = button;
+  playBtn.addEventListener('click', () => {
     if (!frame) {
       frame = document.createElement('iframe');
+      frame.src = 'https://devonmvfisher.github.io/vesper/';
+      frame.title = 'Vesper playable browser planetarium';
       frame.allow = 'fullscreen';
-      frame.setAttribute('allowfullscreen', '');
       host.appendChild(frame);
     }
-    if (activeUrl !== url) {
-      session += 1;
-      activeUrl = url;
-      frame.src = url;
-    }
-    frame.title = title + ' playable world';
-    fullPage.href = url;
-    fullPage.setAttribute('aria-label', 'Open ' + title + ' full page in a new tab');
-    name.textContent = title;
-    say('');
     panel.hidden = false;
     arch.classList.add('playing');
-    header.classList.add('world-open');
-    syncFullscreen();
-    arch.scrollIntoView({ behavior:still ? 'auto' : 'smooth', block:'start' });
-    closer.focus({ preventScroll:true });
+    grid.style.gridTemplateColumns = '1fr';
+    closeBtn.focus();
+  });
+  function close() {
+    if (frame) { frame.remove(); frame = null; }
+    panel.hidden = true;
+    arch.classList.remove('playing');
+    grid.style.gridTemplateColumns = '';
+    playBtn.focus();
   }
-  function closeWorld() {
-    session += 1;
-    if (frame) frame.remove();
-    frame = null;
-    activeUrl = '';
-    if (ownsFullscreen()) {
-      showClosedFullscreen();
-      void leaveFullscreen();
-    } else restoreArch();
-  }
-  document.querySelectorAll('[data-play]').forEach(button => {
-    button.addEventListener('click', () => openWorld(button));
-  });
-  closer.addEventListener('click', closeWorld);
-  hideHint.addEventListener('click', () => {
-    hint.hidden = true;
-    closer.focus({ preventScroll:true });
-  });
-  fullscreen.addEventListener('click', async () => {
-    if (pendingFullscreen || exitingFullscreen) return;
-    if (ownsFullscreen()) { await leaveFullscreen(); return; }
-    if (!frame) return;
-    if (typeof arch.requestFullscreen !== 'function' || document.fullscreenEnabled === false) {
-      say('Full screen is not available here. Keep playing in this window or choose Open full page.');
-      return;
-    }
-    const current = session;
-    pendingFullscreen = true;
-    syncFullscreen();
-    try {
-      // Called directly from the user's click, before any await.
-      await arch.requestFullscreen();
-      if (current !== session) {
-        // A closed or replaced session must not carry its pending request into the new one.
-        if (document.fullscreenElement === arch) await leaveFullscreen();
-        return;
-      }
-      if (frame) say('');
-      if (!frame && ownsFullscreen()) { showClosedFullscreen(); await leaveFullscreen(); }
-    } catch (_) {
-      if (current === session && frame) {
-        say('Full screen was not allowed. Keep playing in this window or choose Open full page.');
-      }
-    } finally {
-      pendingFullscreen = false;
-      syncFullscreen();
-      if (!frame) restoreArch();
-    }
-  });
-  document.addEventListener('fullscreenchange', () => {
-    const active = ownsFullscreen();
-    if (wasFullscreen && !active) lastFullscreenExit = performance.now();
-    const returned = wasFullscreen && !active;
-    wasFullscreen = active;
-    syncFullscreen();
-    if (!frame) {
-      if (active) { showClosedFullscreen(); void leaveFullscreen(); }
-      else restoreArch();
-    } else if (returned) {
-      say('');
-      fullscreen.focus({ preventScroll:true });
-    }
-  });
-  function showImageError() {
-    imageFallback.hidden = false;
-    caption.textContent = location.protocol === 'file:'
-      ? 'Preview image unavailable. Extract all files and keep hero-vesper-arch.jpg beside index.html.'
-      : 'Preview image unavailable. You can still use the world links below.';
-  }
-  hero.addEventListener('error', showImageError);
-  hero.addEventListener('load', () => {
-    imageFallback.hidden = true;
-    caption.textContent = normalCaption;
-  });
-  // A finished failed image may predate these listeners; pending images are left alone.
-  if (hero.complete && hero.naturalWidth === 0) showImageError();
-  document.addEventListener('keydown', event => {
-    // Cross-origin game key events do not bubble here. Native Esc still exits fullscreen.
-    if (event.key !== 'Escape' || event.repeat || event.defaultPrevented || !frame) return;
-    if (ownsFullscreen() || pendingFullscreen || performance.now() - lastFullscreenExit < 300) return;
-    event.preventDefault();
-    closeWorld();
-  });
+  closeBtn.addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && frame) close(); });
 })();
 </script>
 </body>

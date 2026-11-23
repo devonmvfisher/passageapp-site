@@ -1,24 +1,11 @@
-# passageapp-site
+# passageapp-site (v2.0 Hub)
 
-The page at **https://passageapp.ca**: Passage, a one-founder studio in Manitoba. Myth on one side, machines on the other.
+Static multi-door hub powering **https://passageapp.ca**:
+- `/` - Flagship studio hub with live Vesper arch and measured public record
+- `/security/` - `shadow-xray` v0.8.0 showcase, public malware takedown case study, and verification repos
+- `/services/` - Remote availability, 3 fixed-scope technical offers, free kits, and support
+- `/lab/` - 5 live browser-runnable interactive tools (`AI Setup Periodic Table`, `Shadow X-Ray Live Demo`, `Song-to-Video Kit v2`, `Storyteller Starter Kit`, `Little Theatre`)
+- `/studio/` - 3 playable 3D browser worlds, 15 films newest-first with stills, and Shrimp World
+- `/llms.txt` & `/index.json` - Agent-native machine-readable studio index
 
-The page lets you play three browser worlds in a window, lists the studio's films, each linked to its post on X, and links the small tools that check AI work.
-
-## The main files
-
-| File | What it is |
-|---|---|
-| `index.html` | The whole page: markup, styles and script in one file. |
-| `hero-vesper-arch.jpg` | The opening picture, a cropped frame from [Vesper](https://github.com/devonmvfisher/vesper). |
-| `og-poster.png` | The share card shown when the page is linked. |
-| `CNAME` | Points GitHub Pages at passageapp.ca. |
-
-The worlds live in their own repositories ([vesper](https://github.com/devonmvfisher/vesper), [feel-and-be-felt](https://github.com/devonmvfisher/feel-and-be-felt) and [devonmvfisher.github.io](https://github.com/devonmvfisher/devonmvfisher.github.io)). The films are not stored here; the page links to their posts on X.
-
-To look at it locally, open `index.html` in a browser. The fonts load from Google Fonts and the worlds from GitHub Pages, so both need a connection.
-
-## Licence
-
-The code is under the MIT licence in [LICENSE](LICENSE). The written page copy, the pictures and the films are not; [NOTICE.md](NOTICE.md) says what is covered and credits the planet maps (Solar System Scope, CC BY 4.0).
-
-Made by [Devon Fisher](https://github.com/devonmvfisher), with AI coding agents doing most of the building. On X: [@Devon8zzh](https://x.com/Devon8zzh).
+Open `index.html` locally or deploy directly to GitHub Pages (zero build step).

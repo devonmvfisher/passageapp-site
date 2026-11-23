@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://passageapp.ca/</loc>
-    <lastmod>2026-10-21</lastmod>
-  </url>
+  <url><loc>https://passageapp.ca/</loc></url>
+  <url><loc>https://passageapp.ca/security/</loc></url>
+  <url><loc>https://passageapp.ca/services/</loc></url>
+  <url><loc>https://passageapp.ca/lab/</loc></url>
+  <url><loc>https://passageapp.ca/lab/ai-table/</loc></url>
+  <url><loc>https://passageapp.ca/lab/shadow-xray-demo/</loc></url>
+  <url><loc>https://passageapp.ca/lab/song-to-video/</loc></url>
+  <url><loc>https://passageapp.ca/lab/storyteller-kit/</loc></url>
+  <url><loc>https://passageapp.ca/lab/theatre/</loc></url>
+  <url><loc>https://passageapp.ca/studio/</loc></url>
 </urlset>

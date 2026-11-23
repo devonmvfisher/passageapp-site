@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Follow Along: Storyteller Starter Kit</title>
+<style>
+/* One file. No outside fonts, scripts, images or links. One step open at a time. */
+:root{
+  --bg:#f5e9e2;--fg:#24080e;--muted:#6e3d44;--card:#fffaf6;--card2:#f7ebe4;--line:rgba(150,40,52,.36);
+  --accent:#a8162b;--btn:#a8162b;--btn-fg:#fffaf6;--gold-ink:#74540e;
+  --warn:#834f07;--ok:#2a6a26;--ok-soft:#e2efdb;--text-bg:#fffdfb;--focus:#245f96;
+  --mq-bg:#14030a;--mq-bg2:#4a0c1b;--mq-ink2:#eccbc0;--mq-gold:#eec46e;--mq-gold-hi:#fbe3a6;--mq-line:rgba(238,196,110,.58);
+  --display:"Bodoni Moda","Bodoni MT",Didot,"Playfair Display",Georgia,serif;
+  --label:"Josefin Sans","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  --body:"Jost","Segoe UI",Roboto,system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a0509;--fg:#fcefe8;--muted:#d2a79c;--card:#2b0912;--card2:#22060d;--line:rgba(224,179,95,.5);
+    --accent:#ff8a92;--btn:#e0b35f;--btn-fg:#1d0509;--gold-ink:#f2c878;
+    --warn:#ffbf6a;--ok:#a6e394;--ok-soft:#14301a;--text-bg:#19040a;--focus:#a3ccff;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a0509;--fg:#fcefe8;--muted:#d2a79c;--card:#2b0912;--card2:#22060d;--line:rgba(224,179,95,.5);
+  --accent:#ff8a92;--btn:#e0b35f;--btn-fg:#1d0509;--gold-ink:#f2c878;
+  --warn:#ffbf6a;--ok:#a6e394;--ok-soft:#14301a;--text-bg:#19040a;--focus:#a3ccff;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--bg);scroll-padding-top:12px}
+body{margin:0;background:var(--bg);color:var(--fg);font:19px/1.5 var(--body);overflow-wrap:anywhere}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 80px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+p{margin:8px 0}
+button{font:inherit;color:inherit}
+.marquee{position:relative;margin:14px 0 0;padding:20px 20px 16px;border:1px solid var(--mq-line);border-radius:6px;
+  background:linear-gradient(160deg,var(--mq-bg),var(--mq-bg2))}
+.eyebrow{margin:0 118px 6px 0;font:700 12px/1.3 var(--label);letter-spacing:.26em;text-transform:uppercase;color:var(--mq-gold)}
+.marquee h1{margin:0;font:600 clamp(36px,9vw,58px)/1 var(--display);letter-spacing:.02em;color:var(--mq-gold-hi)}
+.marquee p.sub{color:var(--mq-ink2);margin:10px 0 0;max-width:30em}
+.themebtn{position:absolute;right:12px;top:12px;font:700 11px/1 var(--label);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mq-gold);background:transparent;border:1px solid var(--mq-line);border-radius:8px;padding:9px 10px;cursor:pointer;min-height:36px}
+.nos{background:var(--card);border:2px solid var(--warn);border-radius:12px;padding:10px 14px;margin:14px 0 0}
+.prog{margin:16px 0 4px}
+.prog-top{font:700 13px/1.2 var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink)}
+.bar{height:12px;border-radius:999px;border:1px solid var(--line);background:var(--card2);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;width:0;background:var(--ok)}
+.level{margin:26px 0 8px;font:700 14px/1.3 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink)}
+.step{background:var(--card);border:2px solid var(--line);border-radius:16px;margin:10px 0;overflow:hidden;scroll-margin-top:10px}
+.step.opt{border-style:dashed}
+.step.open{border-color:var(--accent)}
+.step.done{border-color:var(--ok)}
+.shead{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;background:transparent;border:0;text-align:left;cursor:pointer;min-height:56px}
+.step.done .shead{background:var(--ok-soft)}
+.num{flex:none;min-width:36px;height:36px;border-radius:9px;display:grid;place-items:center;background:var(--btn);color:var(--btn-fg);font:700 16px/1 var(--label)}
+.step.done .num{background:var(--ok);color:var(--bg)}
+.stitle{flex:1 1 auto;min-width:0;font:600 21px/1.25 var(--display)}
+.state{flex:none;font:700 12px/1 var(--label);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.step.done .state::after{content:"Done";color:var(--ok)}
+.step.done.skipped .state::after{content:"Skipped";color:var(--muted)}
+.step.open:not(.done) .state::after{content:"Now";color:var(--accent)}
+.sbody{padding:0 14px 14px}
+.js .step:not(.open) .sbody{display:none}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.go{min-height:50px;padding:12px 20px;font:700 16px/1 var(--label);letter-spacing:.06em;text-transform:uppercase;
+  background:var(--btn);color:var(--btn-fg);border:0;border-radius:12px;cursor:pointer}
+.skip,.undo{min-height:50px;padding:12px 16px;font:700 14px/1 var(--label);letter-spacing:.06em;text-transform:uppercase;
+  background:transparent;color:var(--accent);border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.step:not(.done) .undo{display:none}
+.step.done .go,.step.done .skip{display:none}
+html:not(.js) .acts{display:none}
+.cb{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:12px 0 0}
+.cbh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.cbh .lbl{font-weight:700;font-size:16px;flex:1 1 140px;min-width:0}
+button.cp{min-height:44px;padding:8px 16px;font:700 15px/1 var(--label);letter-spacing:.06em;text-transform:uppercase;
+  background:var(--btn);color:var(--btn-fg);border:0;border-radius:10px;cursor:pointer}
+button.cp.ok{background:var(--ok);color:var(--bg)}
+button.cp.no{background:var(--warn);color:var(--bg)}
+.text{display:block;width:100%;margin:8px 0 0;padding:8px 10px;font:16px/1.45 ui-monospace,Consolas,"Courier New",monospace;
+  color:var(--fg);background:var(--text-bg);border:1px solid var(--line);border-radius:8px}
+textarea.text{resize:vertical}
+.addr{font:700 21px/1.3 ui-monospace,Consolas,"Courier New",monospace;background:var(--text-bg);border:1px solid var(--line);
+  border-radius:8px;padding:12px 12px;margin:12px 0 0;-webkit-user-select:all;user-select:all}
+.msg{margin:6px 0 0;font-size:15px;color:var(--muted)}
+.msg:empty{display:none}
+details.more{margin:14px 0 0}
+details.more > summary{display:block;list-style:none;cursor:pointer;font:700 13px/1.3 var(--label);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px 0;min-height:36px}
+details.more > summary::-webkit-details-marker{display:none}
+details.more > summary::before{content:"+  "}
+details.more[open] > summary::before{content:"\2212  "}
+details.more .in{font-size:17px;color:var(--muted);border-left:3px solid var(--line);padding:0 0 0 12px}
+.finish{display:none;background:var(--ok-soft);border:2px solid var(--ok);border-radius:16px;padding:14px 16px;margin:16px 0}
+.finish.show{display:block}
+.finish b{font:600 22px/1.25 var(--display)}
+h2{font:700 16px/1.25 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);margin:40px 0 8px;padding-top:12px;border-top:2px solid var(--line)}
+details.fold{margin:10px 0}
+details.fold > summary{display:block;list-style:none;font:700 14px/1.3 var(--label);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold-ink);padding:13px 12px 11px;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer}
+details.fold > summary::-webkit-details-marker{display:none}
+details.fold > summary::before{content:"+  "}
+details.fold[open] > summary::before{content:"\2212  "}
+details.fold .in{padding:4px 4px 0;font-size:17px}
+ol.basics{padding-left:24px;margin:10px 0}
+ol.basics li{margin-bottom:8px}
+.reset{font:700 13px/1 var(--label);letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--accent);
+  border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-height:44px;cursor:pointer;margin-top:8px}
+@media (prefers-reduced-motion:no-preference){ .bar i{transition:width .25s ease} }
+</style>
+</head>
+<body>
+<div id="passage-bar" style="position:sticky;top:0;z-index:9999;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;background:#090507;border-bottom:1px solid rgba(214,168,90,.35);font:500 13px/1.2 system-ui,-apple-system,sans-serif;color:#efe3e4">
+  <a href="../../index.html" style="color:#d6a85a;text-decoration:none;font-weight:700">&larr; Passage Hub</a>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="../index.html" style="color:#efe3e4;text-decoration:none">All Lab Tools</a>
+    <a href="../../security/" style="color:#efe3e4;text-decoration:none">Security</a>
+    <a href="../../services/" style="color:#efe3e4;text-decoration:none">Services</a>
+    <a href="https://buymeacoffee.com/devon8zzh" target="_blank" rel="noopener" style="color:#d6a85a;text-decoration:none">Support</a>
+  </div>
+</div>
+<div class="wrap">
+  <header class="marquee">
+    <button type="button" class="themebtn" id="theme">Light / dark</button>
+    <p class="eyebrow">Storyteller starter kit</p>
+    <h1>Follow Along</h1>
+    <p class="sub">One step at a time. Do the open step, press Done, and the next one opens.</p>
+  </header>
+
+  <noscript><p class="nos">The buttons on this page are turned off in this viewer. You can still read every step below.</p></noscript>
+
+  <div class="prog" aria-live="polite">
+    <div class="prog-top"><span id="progtext">0 of 11 numbered steps done</span></div>
+    <div class="bar"><i id="progbar"></i></div>
+  </div>
+
+<p class="level">Level 1: one character</p>
+<section class="step" id="s1" data-step="s1"><button type="button" class="shead" data-open="s1" aria-expanded="false"><span class="num">1</span><span class="stitle">Open your AI chat app</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Use the one you already have: Gemini, Grok, ChatGPT or Claude. Start a new chat.</p><div class="acts"><button type="button" class="go" data-done="s1">Done. Next step</button><button type="button" class="undo" data-undo="s1">Not done yet</button></div></div></section>
+<section class="step" id="s2" data-step="s2"><button type="button" class="shead" data-open="s2" aria-expanded="false"><span class="num">2</span><span class="stitle">Send it this message</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Press Copy, paste it into the new chat, and send it.</p><div class="cb"><div class="cbh"><span class="lbl">The message</span><button type="button" class="cp" data-copy="paste">Copy</button></div><textarea class="text big" id="paste" readonly rows="6" aria-label="The message">You are my creative partner and my guide. I write stories and make characters. I am new to working with an AI this way, so go slowly and keep it plain.
+
+HOW TO WORK WITH ME
+1. One question at a time. Keep replies short unless I ask for something long (the bible, a page, a scene, shot words, notes). No technical words; if you must use one, explain it in one line.
+2. Start from what I already have. Ask me to tell you about one character or story I care about, in my own messy words. If I answer with a story, ask who is at the heart of it. Do not hand me a form to fill in.
+3. My characters and stories are mine. Do not rewrite them or add big new facts unless I ask. If you need something I have not told you, ask me. Offer options and let me choose.
+4. Rough first. Help me finish a rough version before we polish anything. If I get stuck polishing, say so kindly and bring me back.
+5. Keep a &quot;bible&quot;: a running record of what is true about my characters and world (names, looks, voices, rules), plus any scenes and shot words we write. Stick to it. If I say &quot;maybe&quot; or &quot;I guess&quot;, mark that fact as a maybe. If I change my mind, update it. If you notice you slipped, say so.
+6. Be honest. If you are guessing, say &quot;guess&quot;. If you cannot do something in this app (make a video, remember me in a new chat, open a file), say so plainly and tell me what kind of tool would. Product names and prices you know may be out of date; say that too. Never pretend.
+7. Do not push me to post or share my work. That is my choice.
+8. Never ask me for a password, a card number or any ID.
+
+THE PATH
+The levels are a suggested order and I can skip around. Take me one small step at a time and do not explain the whole path at once. If I jump ahead, tell me in one line what I am skipping, then help me anyway.
+Level 1: we talk about one character until you can describe them back to me and I say &quot;yes, that is them&quot;. Then write their character page for the bible. End it with &quot;the look&quot;: a few plain lines on how they look, which I will reuse word for word in pictures and video. If I have not said how they look, ask me.
+Level 2: add the world to the bible, then write one short scene together.
+Level 3: my first video. Short: one character, one place, one moment, four shots (a shot is one clip). First ask which video tool I have. If I have none, tell me what kinds exist and let me choose; do not choose for me. Most video tools make clips of a few seconds, so we make four clips and join them. Then give me the exact words for one shot at a time. Start each one with the look if the character is in it.
+Level 4 (&quot;pro&quot;): this is already written down, in the pro folder of the kit this message came from. Tell me to open the file README.md in that folder and paste in the piece I want. Do not make up your own version of those pieces. If I do not have that folder, say so and tell me to ask whoever gave me this message.
+
+WORDS I CAN SAY
+These count only when I send one by itself. I will not remember them all, so remind me of one when it would help.
+&quot;bible&quot; = show me the bible so far.
+&quot;save&quot; = give me everything as one block of text I can copy into my own notes: the whole bible, any scenes and shot words, then my level and my next step. You may not remember me in a new chat, so remind me to save now and then.
+&quot;notes&quot; = honest feedback on what we just made: what works, what is weak, and why. Kind, specific, no flattery.
+&quot;rough&quot; = stop polishing, help me finish.
+&quot;next&quot; = the next small step. After Level 3, ask me what I want: another character, another scene or another video.
+&quot;where am I&quot; = my level and my next small step.
+&quot;too much&quot; = say it again, shorter.
+&quot;pro&quot; = Level 4.
+
+HOW TO START
+If there is a saved bible below this line, or I paste one later, do not start over: read it, tell me in two lines where we were, and ask what I want to do.
+Otherwise: greet me in two sentences, then ask your first question.
+</textarea><p class="msg" id="paste-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>It tells the AI to go slowly, ask one thing at a time, and leave your characters alone unless you ask.</p></div></details><div class="acts"><button type="button" class="go" data-done="s2">Done. Next step</button><button type="button" class="undo" data-undo="s2">Not done yet</button></div></div></section>
+<section class="step" id="s3" data-step="s3"><button type="button" class="shead" data-open="s3" aria-expanded="false"><span class="num">3</span><span class="stitle">Answer its first question</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Tell it about one character, the way you would tell a friend. Messy is fine, but leave out private details about real people. Keep going until it describes them back to you and you can tell it: yes, that is them.</p><details class="more"><summary>More about this step</summary><div class="in"><p>It should then write a character page. The page ends with "the look": a few lines on how they look. You reuse those lines, word for word, for pictures and video.</p></div></details><div class="acts"><button type="button" class="go" data-done="s3">Done. Next step</button><button type="button" class="undo" data-undo="s3">Not done yet</button></div></div></section>
+<section class="step" id="s4" data-step="s4"><button type="button" class="shead" data-open="s4" aria-expanded="false"><span class="num">4</span><span class="stitle">Save before you stop</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Send this one word. Copy what it gives you into your own notes app. The AI may not remember you next time.</p><div class="cb"><div class="cbh"><span class="lbl">Send this</span><button type="button" class="cp" data-copy="w-save-1">Copy</button></div><input class="text" id="w-save-1" readonly value="save" aria-label="Send this"><p class="msg" id="w-save-1-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>To pick up later: start a new chat and send the message from step 2 with your saved block underneath it, both in one message.</p></div></details><div class="acts"><button type="button" class="go" data-done="s4">Done. Next step</button><button type="button" class="undo" data-undo="s4">Not done yet</button></div></div></section>
+<p class="level">Level 2: the world and a scene</p>
+<section class="step" id="s5" data-step="s5"><button type="button" class="shead" data-open="s5" aria-expanded="false"><span class="num">5</span><span class="stitle">Build the world, write one scene</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Send this word. It should add the world to your record and write one short scene with you. Send "save" again when you stop. Press Done when the scene is written.</p><div class="cb"><div class="cbh"><span class="lbl">Send this</span><button type="button" class="cp" data-copy="w-next-1">Copy</button></div><input class="text" id="w-next-1" readonly value="next" aria-label="Send this"><p class="msg" id="w-next-1-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>That record is called your bible: the running list of what is true about your characters and world.</p></div></details><div class="acts"><button type="button" class="go" data-done="s5">Done. Next step</button><button type="button" class="undo" data-undo="s5">Not done yet</button></div></div></section>
+<p class="level">Optional: a first picture</p>
+<section class="step opt" id="sp" data-step="sp"><button type="button" class="shead" data-open="sp" aria-expanded="false"><span class="num">+</span><span class="stitle">See your character</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Open this free site in your web browser. Give it the look from your character page, word for word, then where they are. Three tries, then keep the closest one. Expect to sign in with a Google account. It is for adults (18 or over) only: open More below first if that is not you.</p><p class="addr">flow.google.com</p><details class="more"><summary>More about this step</summary><div class="in"><p>Type the address into the address bar at the top of your browser, not into a search box. Do not follow a link to it from a message or an advert.</p><p>Google keeps your credits with your Google account, so expect to sign in. Signing in on Google's own page is not the same as typing a password into a chat. If you have no Google account, making one is your choice, and it asks for some details about you.</p><p>You must be 18 or over, with your age checked on your Google account, and in a country Google supports. If it is not for you, ask your AI what else is free today, and treat the answer as a guess.</p><p>A new project starts ready for pictures: start one, type in the box and press Generate. To keep a picture, point at it, click More, then Download, then choose the kind of file. On an Android phone it is an app called Google Flow: select the picture, tap More, then Download. (Read on Google's help pages, November 21, 2026. Its own page about pictures was not read.) If your screen looks different, ask your AI: I am on Google Flow and want to make one picture, tell me what to look for, and tell me if you are guessing.</p><p>Pictures cost no credits there when a guide's authors tested it on November 20, 2026. Google's own page names a default picture model that is at no charge. Other picture models may cost credits.</p></div></details><div class="acts"><button type="button" class="go" data-done="sp">Done. Next step</button><button type="button" class="skip" data-done="sp">Skip this</button><button type="button" class="undo" data-undo="sp">Not done yet</button></div></div></section>
+<p class="level">Optional: you already have a song</p>
+<section class="step opt" id="sg" data-step="sg"><button type="button" class="shead" data-open="sg" aria-expanded="false"><span class="num">+</span><span class="stitle">Make this video for your song</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Made a song? Send this before step 6. Your AI plans four shots to fit about 20 seconds of it. Paid Suno plan: you download the song and put it under the clips at step 10. Free plan: the song stays on Suno and its link goes with your video. Not sure which? Open More. No song? Skip this.</p><div class="cb"><div class="cbh"><span class="lbl">Send this</span><button type="button" class="cp" data-copy="q-song">Copy</button></div><textarea class="text" id="q-song" readonly rows="4" aria-label="Send this">I made a song and I want my first video to go with it. Help me choose about 20 seconds of the song. I will tell you what that part sounds like and what it is about. Plan my four shots to fit it. In the shot words, describe only what the camera sees, and leave the song&#x27;s words out. Add to my record that this video is for my song, which 20 seconds we chose, and that when I join the clips you should ask me whether I have the song as a file. If I do, help me put it under the clips. If I do not, tell me to leave the video silent and keep the song&#x27;s link with it.</textarea><p class="msg" id="q-song-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>Not sure which plan you are on? Here is a test that was not read on Suno's pages but follows from what they say: press your song's three dots (...) and point at Download. A paid plan shows download choices to pick from. On the free plan, Suno's help says you need to upgrade to download. You do not have to: the song's link does the job.</p><p>Suno's help pages say the free plan has 0 downloads, Pro has 20 a month and Premier has 60, and every plan can play a song from its link (read November 21, 2026).</p><p>Two shorter ways, if making clips is not your thing. Suno can make the video itself: your song's three dots, then Create Visual, then Video Clip. You pick the song and the part that plays, and it can show the song's words. It uses Suno credits. How many, and on which plans, was not read. And if you already hold credits at a paid site called Slop Cannon, it makes a music video from your song: the page TOOL-MAP.txt says how. Do not buy anything just to finish this. (Read on those companies' own pages, November 21, 2026.)</p><p>Picture and video tools often refuse rude words, even in a joke (not checked for this kit). That is why the message says to describe only what the camera sees.</p><p>Twenty seconds is four clips of 5 seconds, which fits one day's free credits. For the whole song, the page TOOL-MAP.txt has a way that uses pictures. It needs your song as a file.</p></div></details><div class="acts"><button type="button" class="go" data-done="sg">Done. Next step</button><button type="button" class="skip" data-done="sg">Skip this</button><button type="button" class="undo" data-undo="sg">Not done yet</button></div></div></section>
+<p class="level">Level 3: a first video</p>
+<section class="step" id="s6" data-step="s6"><button type="button" class="shead" data-open="s6" aria-expanded="false"><span class="num">6</span><span class="stitle">Tell your AI you want a video</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Send this. It should ask which video tool you have. You can answer: a free one called Google Flow. It then gives you the words for one shot at a time. Press Done when you have the words for shot 1.</p><div class="cb"><div class="cbh"><span class="lbl">Send this</span><button type="button" class="cp" data-copy="w-l3">Copy</button></div><input class="text" id="w-l3" readonly value="level 3" aria-label="Send this"><p class="msg" id="w-l3-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>The video is four shots: where we are, who this is, the moment, and what it leaves behind. Have your character's look ready.</p><p>Your AI may not know Flow's current limits. If you have the kit folder, you can paste the page TOOL-MAP.txt into the chat and say: use this for my tools.</p><p>Your AI knows the levels from the first message, so those two words are enough.</p></div></details><div class="acts"><button type="button" class="go" data-done="s6">Done. Next step</button><button type="button" class="undo" data-undo="s6">Not done yet</button></div></div></section>
+<section class="step" id="s7" data-step="s7"><button type="button" class="shead" data-open="s7" aria-expanded="false"><span class="num">7</span><span class="stitle">Open the free video site</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Type this address into your browser's address bar. Expect to sign in with a Google account: Google keeps your free credits, its points, with your account. You get 50 a day and each clip uses some. Adults (18 or over) only. If that is not you, or you have no Google account, open More below first.</p><p class="addr">flow.google.com</p><details class="more"><summary>More about this step</summary><div class="in"><p>Type it in yourself, not into a search box, and do not follow a link to it from a message or an advert. Signing in on Google's own page is not the same as typing a password into a chat. If you have no Google account, making one is your choice, and it asks for some details about you.</p><p>On a computer, Google says to use a browser such as Google Chrome. On an Android phone it is an app called Google Flow: get it only from the phone's own app store. An iPhone was not looked up.</p><p>You must be 18 or over, with your age checked on your Google account, and in a country Google supports. If it is not for you, ask your AI what else is free today, and treat the answer as a guess.</p><p>At busy hours, roughly 2 PM to 5 PM in the time zone called UTC, accounts with no paid plan may not be able to make videos. Ask your AI what time that is where you live, and try later.</p><p>The Google facts in this step were read on Google's own help pages on November 21, 2026. If the site shows something different from this page, the site is right.</p></div></details><div class="acts"><button type="button" class="go" data-done="s7">Done. Next step</button><button type="button" class="undo" data-undo="s7">Not done yet</button></div></div></section>
+<section class="step" id="s8" data-step="s8"><button type="button" class="shead" data-open="s8" aria-expanded="false"><span class="num">8</span><span class="stitle">Make your first clip</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Start a new project. Paste the words for shot 1 into the box. Click the model name in the box, then Video. Choose the low-cost setting, 5 seconds if it offers it, and 1 output (one clip): two at once costs double. Then press Generate. If your screen looks different, ask your AI this.</p><div class="cb"><div class="cbh"><span class="lbl">Ask this</span><button type="button" class="cp" data-copy="q-flow">Copy</button></div><textarea class="text" id="q-flow" readonly rows="4" aria-label="Ask this">I am on Google Flow at flow.google.com and I want to make one 5 second video clip on the setting that costs the fewest credits. I cannot see where to type my words or where to choose the setting and the length. Tell me what to look for on the screen, one step at a time, and tell me if you are guessing.</textarea><p class="msg" id="q-flow-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>Those button names were read on Google's own help pages for a computer, on November 21, 2026. Google's pages say the model name is in the box, and put these settings at the bottom of the box.</p><p>On an Android phone, in the Google Flow app: tap + New, type in the box, tap the generation type at the bottom right (it starts on Image), tap Video, choose the same things, then tap Generate. (Read on Google's help page for Android, November 21, 2026.)</p><p>The box starts on a picture model, which is why you click the model name first. The low-cost video setting was called Omni Flash 1.2 at 360p, the smallest size listed: 1 credit for each second. Names change, and Google says three older video models end on December 5, 2026, so look for the fewest credits. The prices show under Settings, at the top right of the box.</p><p>The low-cost clips are small. At busy hours you may not be able to make videos for a while: step 7's More has the hours. That is the site, not you. If a clip fails or is refused, Google says the credits come back within an hour. Google also says every video made there carries an invisible mark called SynthID.</p></div></details><div class="acts"><button type="button" class="go" data-done="s8">Done. Next step</button><button type="button" class="undo" data-undo="s8">Not done yet</button></div></div></section>
+<section class="step" id="s9" data-step="s9"><button type="button" class="shead" data-open="s9" aria-expanded="false"><span class="num">9</span><span class="stitle">Make the other clips, and keep them</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Ask your AI for the words for each next shot. Four shots, two tries each: eight clips, about 40 credits. To keep a clip, point at it, click More, then Download, and pick the kind of file. Do it for every clip, the first too. Out of credits? Tell your AI "save", wait until tomorrow, do not pay.</p><div class="cb"><div class="cbh"><span class="lbl">Ask this if you cannot find Download</span><button type="button" class="cp" data-copy="q-save">Copy</button></div><textarea class="text" id="q-save" readonly rows="4" aria-label="Ask this if you cannot find Download">how do I save a clip from Google Flow to my phone or computer? tell me if you are guessing</textarea><p class="msg" id="q-save-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>Point at it, More, Download and the kind of file were read on Google's own help page for a computer, on November 21, 2026. Pick a video, not the choice called GIF. On an Android phone: open your project, select the clip, tap More, then Download (Google's help page for Android, the same day).</p><p>Your credits renew the day after you first use them, and unused ones do not carry over. To see how many you have left, click your picture or initial at the top right (the same Google pages). Do not pay for a tool just to finish this.</p></div></details><div class="acts"><button type="button" class="go" data-done="s9">Done. Next step</button><button type="button" class="undo" data-undo="s9">Not done yet</button></div></div></section>
+<section class="step" id="s10" data-step="s10"><button type="button" class="shead" data-open="s10" aria-expanded="false"><span class="num">10</span><span class="stitle">Join the four clips</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Join the better try of each shot, in order: four clips. On the video site, on a computer: point at a clip, click More, then Add to Scene. Do that for all four, drag them into order, then download the scene. To add a song, or if that does not work, ask your AI this.</p><div class="cb"><div class="cbh"><span class="lbl">Ask this</span><button type="button" class="cp" data-copy="q-join">Copy</button></div><textarea class="text" id="q-join" readonly rows="4" aria-label="Ask this">what free app can join four video clips on my phone or computer and put a song I have as a file under them, and how? I only install apps from my device&#x27;s own app store. tell me if you are guessing</textarea><p class="msg" id="q-join-msg" role="status"></p></div><details class="more"><summary>More about this step</summary><div class="in"><p>A scene is the site's word for clips put in order. Add to Scene and dragging into order were read on Google's own help page for a computer, on November 21, 2026. That page says you can download the scene as one video but names no button for it, so look for Download. It does not say you can add your own song there, and Google's phone pages give no steps for scenes.</p><p>No song file, because your Suno plan is free? Join the clips without sound and keep your song's link with the video.</p><p>Only install an app from your phone's or computer's own app store.</p><p>On a computer, a free Microsoft editor called Clipchamp joins clips and adds sound. On Windows 11 it may already be there: open Start and search for Clipchamp. On a Mac it runs in the Chrome or Edge browser, and on a Chromebook in Chrome, at app.clipchamp.com. It does not work in a phone's browser. Its free plan saves the video with no mark on it. You sign in to it with a Microsoft account; making one is your choice, and it asks for some details about you. (Read on Microsoft's support pages, November 21, 2026.)</p><p>On an iPhone or iPad, people use iMovie from the App Store (reported, not read for this kit). For an Android phone nothing was looked up, so ask your AI.</p><p>Add sound last. The page TOOL-MAP.txt has a part about songs.</p></div></details><div class="acts"><button type="button" class="go" data-done="s10">Done. Next step</button><button type="button" class="undo" data-undo="s10">Not done yet</button></div></div></section>
+<section class="step" id="s11" data-step="s11"><button type="button" class="shead" data-open="s11" aria-expanded="false"><span class="num">11</span><span class="stitle">Watch it, then tell your AI</span><span class="state" aria-hidden="true"></span></button><div class="sbody"><p>Watch it once, all the way through, before you change anything. Then tell your AI what you saw and ask what it would change. It cannot watch the video unless your app lets you upload it.</p><details class="more"><summary>More about this step</summary><div class="in"><p>Done means four shots, joined, watched once. Write down one thing you would do differently next time. The good one is video number three.</p></div></details><div class="acts"><button type="button" class="go" data-done="s11">Done</button><button type="button" class="undo" data-undo="s11">Not done yet</button></div></div></section>
+
+  <div class="finish" id="finish"><b>All 11 numbered steps done.</b><p>That is a finished first video. Make another: the good one is video number three.</p></div>
+
+  <h2>If you need them</h2>
+  <details class="fold"><summary>Coming back another day</summary><div class="in">
+    <p>Start a new chat. Send the message from step 2 with your saved block underneath it, both in one message. Then carry on from the step this page has open.</p>
+    <p>If this page forgot your place, tap the title of the step you were on.</p>
+  </div></details>
+  <details class="fold"><summary>Words you can say to your AI</summary><div class="in">
+    <p>Send one of these by itself, any time.</p>
+<div class="cb"><div class="cbh"><span class="lbl">It shows the bible so far: the running record of what is true about your characters and world.</span><button type="button" class="cp" data-copy="word-0">Copy</button></div><input class="text" id="word-0" readonly value="bible" aria-label="It shows the bible so far: the running record of what is true about your characters and world."><p class="msg" id="word-0-msg" role="status"></p></div><div class="cb"><div class="cbh"><span class="lbl">It gives you everything as one block of text to copy: the bible, your scenes and shot words, your level and your next step.</span><button type="button" class="cp" data-copy="word-1">Copy</button></div><input class="text" id="word-1" readonly value="save" aria-label="It gives you everything as one block of text to copy: the bible, your scenes and shot words, your level and your next step."><p class="msg" id="word-1-msg" role="status"></p></div><div class="cb"><div class="cbh"><span class="lbl">Honest feedback on what you just made: what works, what is weak, and why.</span><button type="button" class="cp" data-copy="word-2">Copy</button></div><input class="text" id="word-2" readonly value="notes" aria-label="Honest feedback on what you just made: what works, what is weak, and why."><p class="msg" id="word-2-msg" role="status"></p></div><div class="cb"><div class="cbh"><span class="lbl">It stops polishing and helps you finish.</span><button type="button" class="cp" data-copy="word-3">Copy</button></div><input class="text" id="word-3" readonly value="rough" aria-label="It stops polishing and helps you finish."><p class="msg" id="word-3-msg" role="status"></p></div><div class="cb"><div class="cbh"><span class="lbl">It takes you to the next small step.</span><button type="button" class="cp" data-copy="word-4">Copy</button></div><input class="text" id="word-4" readonly value="next" aria-label="It takes you to the next small step."><p class="msg" id="word-4-msg" role="status"></p></div><div class="cb"><div class="cbh"><span class="lbl">It tells you your level and your next small step.</span><button type="button" class="cp" data-copy="word-5">Copy</button></div><input class="text" id="word-5" readonly value="where am I" aria-label="It tells you your level and your next small step."><p class="msg" id="word-5-msg" role="status"></p></div><div class="cb"><div class="cbh"><span class="lbl">It says it again, shorter.</span><button type="button" class="cp" data-copy="word-6">Copy</button></div><input class="text" id="word-6" readonly value="too much" aria-label="It says it again, shorter."><p class="msg" id="word-6-msg" role="status"></p></div><div class="cb"><div class="cbh"><span class="lbl">It points you to the pro folder (Level 4).</span><button type="button" class="cp" data-copy="word-7">Copy</button></div><input class="text" id="word-7" readonly value="pro" aria-label="It points you to the pro folder (Level 4)."><p class="msg" id="word-7-msg" role="status"></p></div>
+  </div></details>
+  <details class="fold"><summary>Six safety basics</summary><div class="in">
+    <ol class="basics"><li>Never type a password, a card number or an ID into any AI chat.</li><li>Do not open or install files that strangers send you, and ignore anyone offering a &quot;free upgrade&quot; or a &quot;hack&quot; for an AI app.</li><li>A real person&#x27;s face or voice needs their yes before you put it in a picture, a video or a song.</li><li>Before you sell something an AI tool made, read that tool&#x27;s rules on selling. They differ.</li><li>An AI can be confidently wrong. Ask it &quot;is that a guess?&quot;, and check anything that matters somewhere else.</li><li>Whatever you type into an AI app is sent to the company that runs it. Made-up characters and stories are fine. Leave out private details about real people, yourself included.</li></ol>
+  </div></details>
+  <details class="fold"><summary>Where the facts on this page came from</summary><div class="in">
+    <p>Everything about the free site was looked up on November 20 and 21, 2026, and will go out of date. If the site shows something different, the site is right.</p>
+    <p>The 18 or over rule, the countries rule, the 50 credits a day, the button names and the mark on each video were read on Google's own help pages on November 21, 2026. The button names are for a computer and for an Android phone. An iPhone was not looked up. That pictures cost no credits was read in a guide whose authors tested the site. No real person has tried this route with this kit yet.</p>
+    <p>The lines about Suno, Clipchamp and Slop Cannon were read on those companies' own pages on November 21, 2026.</p>
+    <p>The same day a second reader went back to every one of those pages. It found no line that a page said was wrong. Lines that said more than the page does were reworded, marked or cut.</p>
+    <p>If you have the whole kit folder, the page TOOL-MAP.txt lists each fact and its source.</p>
+  </div></details>
+  <details class="fold"><summary>About this page</summary><div class="in">
+    <p>This page is one file. It loads nothing from the internet and sends nothing anywhere.</p>
+    <p>It remembers which steps you finished in this browser only, if the browser lets it. Some phones do not. The page works either way.</p>
+    <p>If you have the whole kit folder: START-HERE.txt covers the same levels in plain text, and the folder named pro holds a later, higher level.</p>
+    <button type="button" class="reset" id="reset">Start over</button>
+    <p class="msg" id="reset-msg" role="status"></p>
+  </div></details>
+</div>
+<script>
+(function(){
+  "use strict";
+  document.documentElement.classList.add("js");
+  var KEY="storyteller-kit-ticks", TKEY="storyteller-kit-theme";
+  function load(k){ try{ return window.localStorage.getItem(k); }catch(e){ return null; } }
+  function save(k,v){ try{ window.localStorage.setItem(k,v); }catch(e){} }
+  var steps=Array.prototype.slice.call(document.querySelectorAll(".step"));
+  var done={}, open=null;
+  try{ done=JSON.parse(load(KEY)||"{}")||{}; }catch(e){ done={}; }
+  if(typeof done!=="object"||Array.isArray(done)) done={};
+  function firstOpen(){
+    var n=-1, i;
+    for(i=0;i<steps.length;i++){ if(!done[steps[i].id]&&!steps[i].classList.contains("opt")){ n=i; break; } }
+    if(n<0) return null;
+    while(n>0&&steps[n-1].classList.contains("opt")&&!done[steps[n-1].id]) n--;
+    return steps[n].id;
+  }
+  function paint(){
+    var total=0, n=0;
+    steps.forEach(function(st){
+      var d=!!done[st.id], o=(st.id===open);
+      st.classList.toggle("done",d); st.classList.toggle("skipped",done[st.id]==="skip"); st.classList.toggle("open",o);
+      st.querySelector(".shead").setAttribute("aria-expanded",String(o));
+      if(!st.classList.contains("opt")){ total++; if(d) n++; }
+    });
+    document.getElementById("progtext").textContent=n+" of "+total+" numbered steps done";
+    document.getElementById("progbar").style.width=(total?Math.round(n*100/total):0)+"%";
+    document.getElementById("finish").classList.toggle("show",n===total);
+  }
+  function show(id,scroll){
+    open=id; paint();
+    if(scroll&&id){ var el=document.getElementById(id); if(el&&el.scrollIntoView) el.scrollIntoView({block:"start"}); }
+  }
+  steps.forEach(function(st,i){
+    st.querySelector(".shead").addEventListener("click",function(){ show(st.id,false); });
+    Array.prototype.forEach.call(st.querySelectorAll("[data-done]"),function(b){
+      b.addEventListener("click",function(){
+        done[st.id]=b.classList.contains("skip")?"skip":true; save(KEY,JSON.stringify(done));
+        var next=null;
+        for(var j=i+1;j<steps.length;j++){ if(!done[steps[j].id]){ next=steps[j].id; break; } }
+        if(!next) next=firstOpen();
+        show(next,true);
+        if(!next){ var f=document.getElementById("finish"); if(f.scrollIntoView) f.scrollIntoView({block:"center"}); }
+      });
+    });
+    st.querySelector("[data-undo]").addEventListener("click",function(){ done[st.id]=false; save(KEY,JSON.stringify(done)); show(st.id,false); });
+  });
+  var armed=false;
+  document.getElementById("reset").addEventListener("click",function(){
+    var had=Object.keys(done).some(function(k){ return done[k]; }), msg=document.getElementById("reset-msg");
+    if(had&&!armed){ armed=true; msg.textContent="This clears every tick. Press Start over again to do it."; return; }
+    armed=false; done={}; save(KEY,"{}"); show(firstOpen(),false);
+    msg.textContent=had?"Started over. Step 1 is open again at the top.":"Nothing to clear. You are at the start.";
+  });
+
+  function flash(btn,msg,ok,text){
+    btn.classList.remove("ok","no"); btn.classList.add(ok?"ok":"no"); btn.textContent=ok?"Copied":"Copy";
+    msg.textContent=text;
+    window.setTimeout(function(){ btn.classList.remove("ok","no"); btn.textContent="Copy"; if(ok) msg.textContent=""; },2500);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("button[data-copy]"),function(btn){
+    btn.addEventListener("click",function(){
+      var id=btn.getAttribute("data-copy"), f=document.getElementById(id), msg=document.getElementById(id+"-msg"), v=f.value;
+      function fallback(){
+        var ok=false;
+        try{ f.focus(); f.select(); f.setSelectionRange(0,v.length); ok=document.execCommand("copy"); }catch(e){ ok=false; }
+        flash(btn,msg,ok,ok?"Copied. Paste it into your chat.":"Could not copy by itself. Press and hold the text, or right-click it, then choose Copy.");
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(v).then(function(){ flash(btn,msg,true,"Copied. Paste it into your chat."); },fallback);
+      } else { fallback(); }
+    });
+  });
+
+  var root=document.documentElement, th=load(TKEY);
+  if(th==="light"||th==="dark") root.setAttribute("data-theme",th);
+  document.getElementById("theme").addEventListener("click",function(){
+    var dark=root.getAttribute("data-theme")==="dark"||(!root.getAttribute("data-theme")&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var next=dark?"light":"dark"; root.setAttribute("data-theme",next); save(TKEY,next);
+  });
+  show(firstOpen(),false);
+})();
+</script>
+</body>
+</html>

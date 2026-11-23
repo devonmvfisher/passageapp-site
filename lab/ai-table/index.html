@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>AI Setup Periodic Table</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one dark wall chart built the way the real table is built: both axes are causes.
+   Rows are shells: where the weights can live, from your pocket down to the lab's vault.
+   Columns are families, ordered from fully open labs to fully closed ones.
+   One element per cell; older versions are its isotopes. Each tile is three colour bands, one per job. */
+:root{
+  --bg:#0B1016; --panel:#141B24; --ink:#EEF3F8; --ink2:#93A1B1; --rule:#2A3542; --accent:#9DBBFF; --hatch:rgba(238,243,248,.24);
+  --g-f:#14534F; --g-i:#C3F4EE;
+  --y-f:#1F5A38; --y-i:#C9F7D6;
+  --v-f:#1B4C73; --v-i:#CBE8FB;
+  --o-f:#43317A; --o-i:#E2D9FD;
+  --p-f:#5E4F12; --p-i:#F8EBA9;
+  --b-f:#6B222B; --b-i:#FBCFD4;
+  --n-f:#6E3F16; --n-i:#FCD8B8;
+  --u-f:#232B35; --u-i:#B5BEC9;
+  --f-display:'Archivo Narrow','Arial Narrow',Arial,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1400px;margin:0 auto;padding-block:28px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:22px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(34px,5vw,56px);line-height:1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:0 0 8px;letter-spacing:.01em}
+.dek{max-width:68ch;color:var(--ink2);margin:10px 0 0;font-size:16px}
+.stamp{font-family:var(--f-mono);font-size:12px;color:var(--ink2);margin:10px 0 0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.howto{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.howto p{margin:0;max-width:76ch}
+.demo{display:grid;grid-template-columns:repeat(3,1fr);width:90px;height:44px;border-radius:3px;overflow:hidden;flex:none;border:1px solid var(--rule)}
+.demo span{display:grid;place-items:center;font:700 14px var(--f-display)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;margin:0;padding:0}
+.legend li{display:flex;align-items:center;gap:7px;font-size:13px}
+.sw{width:22px;height:22px;border-radius:3px;display:grid;place-items:center;font:700 12px var(--f-display)}
+.sw.hatch{background-color:var(--u-f);background-image:repeating-linear-gradient(135deg,transparent 0 5px,var(--hatch) 5px 7px)}
+.sw.gap{background:transparent;border:1.5px dashed var(--ink2)}
+.score{display:flex;flex-wrap:wrap;gap:6px 26px;list-style:none;margin:0;padding:0;font-size:14px}
+.score b{font-weight:600}
+.score span{font-family:var(--f-mono);font-size:12.5px;color:var(--ink2)}
+
+.chart{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px 16px 18px}
+.axis{display:flex;align-items:center;gap:10px;font:400 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:0 0 10px 312px}
+.axis i{flex:1;height:2px;background:var(--ink2);position:relative;min-width:40px}
+.axis i::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left-color:var(--ink2)}
+.scroll{overflow-x:auto;padding-bottom:4px}
+.pt{display:grid;grid-template-columns:172px repeat(2,minmax(56px,1fr)) 10px repeat(15,minmax(56px,1fr));gap:4px;min-width:1240px}
+.fam{display:flex;flex-direction:column;justify-content:flex-end;border-bottom:2px solid var(--ink);padding:0 0 4px;min-width:0}
+.fam b{font:700 13px var(--f-display);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fam span{font-size:10px;color:var(--ink2);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fam i{font:400 9.5px var(--f-mono);color:var(--ink2);font-style:normal;letter-spacing:.06em}
+.shell{display:flex;gap:9px;align-items:center;padding-right:8px;border-right:1px solid var(--rule);min-width:0}
+.shell b{font:700 22px var(--f-display);line-height:1;width:22px;flex:none;text-align:right}
+.shell div{min-width:0}
+.shell strong{display:block;font:700 13px var(--f-display);line-height:1.15}
+.shell em{display:block;font:400 10.5px var(--f-mono);font-style:normal;color:var(--ink);line-height:1.3}
+.shell span{display:block;font-size:10px;color:var(--ink2);line-height:1.2}
+.custody{grid-column:1 / -1;display:flex;align-items:center;gap:12px;font:400 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);padding:6px 0}
+.custody i{flex:1;border-top:1px dashed var(--ink2)}
+
+.el{position:relative;height:68px;border:1px solid var(--rule);border-radius:3px;cursor:pointer;padding:0;min-width:0;overflow:hidden;
+  background:var(--u-f);color:var(--ink);font-family:var(--f-display);text-align:center}
+.bands{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr)}
+.bands span{display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;font:700 10.5px var(--f-display)}
+.bands span.pred{background-image:repeating-linear-gradient(135deg,transparent 0 5px,var(--hatch) 5px 7px)}
+.el .no{position:absolute;left:4px;top:2px;font:400 10px var(--f-mono);z-index:1;opacity:.9}
+.el .nx{position:absolute;right:3px;top:2px;font:700 10px var(--f-mono);z-index:1;border:1px dashed var(--ink);border-radius:2px;padding:0 3px;line-height:1.3}
+.el .sym{position:absolute;left:0;right:0;top:15px;font-weight:700;font-size:23px;line-height:1;z-index:1;text-shadow:0 1px 3px rgba(0,0,0,.65)}
+.el .ver{position:absolute;left:0;right:0;top:39px;font:500 10.5px var(--f-mono);z-index:1;white-space:nowrap;overflow:hidden;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+.el[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;z-index:2}
+.el.gap{background:transparent;border:1.5px dashed var(--ink2)}
+.el.gap .bands{opacity:.4}
+.s-G{background-color:var(--g-f);color:var(--g-i)}
+.s-Y{background-color:var(--y-f);color:var(--y-i)} .s-V{background-color:var(--v-f);color:var(--v-i)}
+.s-O{background-color:var(--o-f);color:var(--o-i)} .s-P{background-color:var(--p-f);color:var(--p-i)}
+.s-B{background-color:var(--b-f);color:var(--b-i)} .s-N{background-color:var(--n-f);color:var(--n-i)}
+.s-U{background-color:var(--u-f);color:var(--u-i)}
+
+.el.plain .ver{top:41px}
+.k-mach{background:#22384F;color:#D6E6F7}
+.k-T{background:#17474B;color:#CFF1F3}
+.k-R{background:#4A2B56;color:#EEDCF6}
+.k-C{background:#5B4A14;color:#F8EBB0}
+.k-I,.k-V,.k-A,.k-M,.k-D{background:#262C38;color:#E6ECF4}
+.k-I{box-shadow:inset 0 -5px 0 #E06C9F} .k-V{box-shadow:inset 0 -5px 0 #F0A04B} .k-A{box-shadow:inset 0 -5px 0 #4FC3D9}
+.k-M{box-shadow:inset 0 -5px 0 #A78BFA} .k-D{box-shadow:inset 0 -5px 0 #9BD35A}
+.sw.k-I,.sw.k-V,.sw.k-A,.sw.k-M,.sw.k-D{border:1px solid var(--rule)}
+.use-head{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin:20px 0 10px;border-bottom:1px solid var(--rule);padding-bottom:5px}
+.use-head b{font:700 19px var(--f-display)}
+.use-head span{font-size:13px;color:var(--ink2)}
+.lvl{font:500 11px var(--f-mono);border:1px solid var(--ink2);border-radius:3px;padding:1px 6px;text-transform:uppercase;letter-spacing:.05em}
+.lvl-starter{border-color:#9BD35A;color:#C9EBA0}
+.el.hl{box-shadow:0 0 0 3px #FFD166 !important;z-index:2}
+.machhead{grid-column:2 / 4}
+.labbox{grid-column:2 / 4;border:1px dashed var(--ink2);border-radius:3px;display:grid;place-items:center;text-align:center;
+  font-size:11.5px;color:var(--ink2);padding:8px;line-height:1.35}
+.series{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;margin-top:16px;padding-top:14px;border-top:1px dashed var(--rule)}
+.series-label{width:172px;flex:none}
+.series-label b{font:700 14px var(--f-display);display:block}
+.series-label span{font-size:11.5px;color:var(--ink2);line-height:1.25;display:block}
+.series-cells{display:flex;flex-wrap:wrap;gap:4px}
+.series-cells .el{width:62px}
+.compounds{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.cmp{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;text-align:left;color:var(--ink);cursor:pointer;
+  font-family:var(--f-body);font-size:13.5px;line-height:1.45;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cmp[aria-pressed="true"]{border-color:#FFD166}
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font:700 17px var(--f-display)}
+.formula span{border-radius:3px;padding:1px 7px}
+.formula i{font-style:normal;color:var(--ink2);font-weight:500}
+.cmp-name{font-weight:600;font-size:14.5px}
+.cmp-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cmp .mini{grid-template-columns:repeat(3,30px);height:24px}
+.cmp-where{font:400 11.5px var(--f-mono);color:var(--ink2)}
+.cmp-note{color:var(--ink2)}
+.uses{margin:6px 0 0;padding-left:18px;font-size:13.5px}
+.uses li{margin-bottom:3px}
+
+.detail{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px 20px;display:grid;gap:14px 26px;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.35fr)}
+@media (max-width:860px){.detail{grid-template-columns:minmax(0,1fr)}}
+.d-head{display:flex;gap:14px;align-items:center;min-width:0}
+.d-tile{flex:none;width:72px}
+.d-name{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.05;margin:0;overflow-wrap:anywhere}
+.d-sub{font-size:13px;color:var(--ink2);margin:3px 0 0}
+.d-note{margin:10px 0 0;max-width:62ch}
+.d-route{margin:10px 0 0;font-size:14px;color:var(--ink2);max-width:62ch}
+.jobs{width:100%;border-collapse:collapse;font-size:13.5px}
+.jobs th{font:400 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);text-align:left;padding:0 8px 6px 0;border-bottom:1px solid var(--rule)}
+.jobs td{padding:7px 8px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.jobs td:first-child{font-weight:500}
+.jobs caption{caption-side:top;text-align:left;font:700 15px var(--f-display);padding:0 0 6px}
+.pill{display:inline-block;border-radius:3px;padding:2px 7px;font-weight:500;font-size:12.5px}
+.mini{display:inline-grid;grid-template-columns:repeat(3,22px);height:20px;border-radius:3px;overflow:hidden;vertical-align:middle}
+.mini span{display:grid;place-items:center;font:700 11px var(--f-display)}
+.grade{font:400 11px var(--f-mono);color:var(--ink2)}
+.tablebox{overflow-x:auto;min-width:0;margin-bottom:16px}
+.d-extra{margin:10px 0 0;font-size:13.5px;max-width:66ch}
+.d-extra b{font-weight:600}
+
+.routes{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+.routes th{font:400 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);text-align:left;padding:0 14px 6px 0;border-bottom:2px solid var(--ink)}
+.routes td{padding:9px 14px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.routes td:first-child{font-weight:600;white-space:nowrap}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px 32px}
+.cols ul{margin:0;padding-left:18px}
+.cols li{margin-bottom:6px;max-width:62ch}
+.tag{font:400 11px var(--f-mono);color:var(--ink2)}
+.sources{font-size:13px;columns:2 320px;column-gap:32px;margin:0;padding:0;list-style:none}
+.sources li{break-inside:avoid;margin-bottom:8px}
+.sources b{font-family:var(--f-display);font-size:14px}
+hr{border:0;border-top:1px solid var(--rule);margin:0}
+</style>
+</head>
+<body>
+<div id="passage-bar" style="position:sticky;top:0;z-index:9999;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;background:#090507;border-bottom:1px solid rgba(214,168,90,.35);font:500 13px/1.2 system-ui,-apple-system,sans-serif;color:#efe3e4">
+  <a href="../../index.html" style="color:#d6a85a;text-decoration:none;font-weight:700">&larr; Passage Hub</a>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="../index.html" style="color:#efe3e4;text-decoration:none">All Lab Tools</a>
+    <a href="../../security/" style="color:#efe3e4;text-decoration:none">Security</a>
+    <a href="../../services/" style="color:#efe3e4;text-decoration:none">Services</a>
+    <a href="https://buymeacoffee.com/devon8zzh" target="_blank" rel="noopener" style="color:#d6a85a;text-decoration:none">Support</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1>Who will do the job</h1>
+    <p class="dek">A periodic table of the elements a working setup is made of: <span id="n-el">the</span> model lines (<span id="n-iso">all their</span> versions counted), the picture, video, voice, music and 3D models, the machines, the runtimes, the routes and the access programs. A setup is a compound of these. The compounds under the table are who can do the job.</p>
+    <p class="stamp">Checked Fri Nov 20 2026. Version 7.</p>
+  </header>
+
+  <div class="howto">
+    <div class="demo" aria-hidden="true"><span class="s-Y">1</span><span class="s-V">2</span><span class="s-O">3</span></div>
+    <p>Every tile is three bands, one per job: <b>1</b> secure coding, <b>2</b> defense, <b>3</b> authorized offense. The bands are the security gates and sit on the chat models only. Every other use is in the compounds under the table. Media models, machines, runtimes, routes and programs are plain tiles.</p>
+  </div>
+  <ul class="legend" id="legend"></ul>
+  <ul class="score" id="score" aria-label="How each job's answers were reached"></ul>
+
+  <section class="chart" aria-label="The table">
+    <div class="axis" aria-hidden="true"><span>Open labs</span><i></i><span>Closed labs</span></div>
+    <div class="scroll"><div class="pt" id="pt"></div></div>
+    <div id="series"></div>
+  </section>
+
+  <section class="detail" id="detail" aria-live="polite"></section>
+
+  <section>
+    <h2>Compounds: who can do which job</h2>
+    <p style="max-width:76ch;margin:0 0 12px;color:var(--ink2)">A setup is a compound: a model, plus the route or the machine and runtime, plus a program where one is needed. The same model in a different compound behaves differently. Click one to light up its elements in the table.</p>
+    <div id="compounds"></div>
+  </section>
+
+  <hr>
+
+  <section class="cols">
+    <div>
+      <h2>Why it is laid out this way</h2>
+      <ul>
+        <li>The real table works because both axes are causes: a row is a shell, a column is the outer electrons. Position alone tells you how an element behaves.</li>
+        <li>Here a row is custody. Above the dashed line you can hold the weights, so no service can gate them. Below it the lab holds them and decides.</li>
+        <li>A column is lineage: one lab's training, licence and jurisdiction. Columns run from labs that publish everything to labs that publish nothing, which is why the filled cells step down to the right.</li>
+        <li>Down any column the models get stronger and the gate gets tighter. Across any row you see what each lab offers for the same hardware.</li>
+        <li>Versions are isotopes: the same element, a different weight. Older isotopes are usually looser.</li>
+        <li>A setup is a compound, not an element. The same model in a different compound behaves differently, which is why routes, machines and programs are elements here too.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>What stands out</h2>
+      <ul>
+        <li>The loosest answers sit in shells 4 and 5, which need a workstation or a rack. A router to a US host gets you the same weights without the hardware. <span class="tag">read</span></li>
+        <li>Will-it is not can-it. In one study Nemotron 3 Super refused 3% of web-testing tasks and solved 2%. <span class="tag">read</span></li>
+        <li>OpenAI's own table: the tier a person can get lowers refusals on GPT-6 Sol, GPT-6 Luna and GPT-5.6 Sol only. <span class="tag">read</span></li>
+        <li>Anthropic's Defense Access takes individuals and covers Opus 5.5, Sonnet 5.5 and Mythos. Exploit development needs an organization. <span class="tag">read</span></li>
+        <li>GLM-5.2 never refused in ten exploit-development tasks, and scored 21.4 on ExploitBench against 38.1 for Opus 4.8 and 57.2 for Mythos Preview. <span class="tag">read</span></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Law and jurisdiction</h2>
+      <ul>
+        <li>Canada restricted the DeepSeek app on federal government devices in February 2025. That is a device policy for government staff. I found no Canadian law against private use. <span class="tag">told</span></li>
+        <li>Zhipu is reported to be on the US Entity List, which limits US firms shipping technology to it. <span class="tag">told</span></li>
+        <li>US hosting changes where prompts are handled. It does not change who built the weights. <span class="tag">told</span></li>
+        <li>Community copies with the refusals stripped out exist for many open weights. The model's licence and the law apply to those too.</li>
+        <li>This is not legal advice.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>How to read it</h2>
+      <ul>
+        <li>A local shell is the smallest machine that holds the model at 4-bit, at roughly 0.55 GB per billion parameters. Sizes come from press and model lists.</li>
+        <li><b>Read</b>: the vendor's page or the report itself. <b>Told</b>: press or a search summary. <b>Yours</b>: your records or your words. <b>By custody</b>: it follows from who holds the weights. <b>Assumed</b>: ordinary coding, with no source saying otherwise. <b>Predicted</b>: taken from a sourced neighbour.</li>
+        <li>"No service gate" is not "the model says yes". Open models from US labs are trained to refuse a good deal. A test on your own machine settles it and touches no account.</li>
+        <li>An empty cell is a lab with nothing in that shell. A dashed tile is a gap the pattern predicts.</li>
+        <li>Left out: Amazon, and labs outside the US and China, which drops Mistral, FLUX and LTX. A media tool with nothing sourced about it is left off, not shown as unknown.</li>
+        <li>This page quotes your own records and rulebook. It is private. Take the lines marked yours out before it goes to anyone else.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Sources</h2>
+    <ul class="sources" id="sources"></ul>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var JOBS=["Secure coding","Defense","Authorized offense"];
+var ST={
+ G:"No service gate", Y:"Allowed by default", V:"After verification", O:"Organizations only", P:"Invited or contract only",
+ B:"Blocked on this model", N:"Not blocked, per reports", U:"Unknown"
+};
+var ORDER=["G","Y","V","O","P","B","N","U"];
+var GR={r:"read",t:"told",y:"yours",c:"by custody",a:"assumed",p:"predicted",n:"nothing found"};
+
+var SHELLS=[
+ {n:1,name:"Pocket",cap:"up to 8 GB",ex:"a phone, any laptop",kind:"local"},
+ {n:2,name:"One GPU",cap:"up to 32 GB",ex:"gaming card, MacBook Pro",kind:"local"},
+ {n:3,name:"Spark class",cap:"up to 128 GB",ex:"DGX Spark, Mac Studio",kind:"local"},
+ {n:4,name:"Workstation",cap:"up to 512 GB",ex:"Mac Studio 512, GPU tower",kind:"local"},
+ {n:5,name:"Rack",cap:"over 512 GB",ex:"multi-GPU servers",kind:"local"},
+ {n:6,name:"Lab cloud, light",cap:"hosted only",ex:"the fast, cheap tier",kind:"cloud"},
+ {n:7,name:"Lab cloud, mid",cap:"hosted only",ex:"the everyday tier",kind:"cloud"},
+ {n:8,name:"Lab cloud, heavy",cap:"hosted only",ex:"the strong tier",kind:"cloud"},
+ {n:9,name:"Lab cloud, top",cap:"hosted only",ex:"the lab's best open to all",kind:"cloud"},
+ {n:10,name:"Lab vault",cap:"verified users",ex:"built for cyber",kind:"vault"}
+];
+var FAMS=[
+ ["nv","NVIDIA","Nemotron","US"],["ds","DeepSeek","DeepSeek","CN"],["ki","Moonshot","Kimi","CN"],["gl","Zhipu","GLM","CN"],
+ ["mx","MiniMax","MiniMax","CN"],["hy","Tencent","Hunyuan","CN"],["qw","Alibaba","Qwen","CN"],["me","Meta","Llama, Muse","US"],
+ ["ms","Microsoft","Phi, MAI","US"],["go","Google","Gemma, Gemini","US"],["oa","OpenAI","gpt-oss, GPT","US"],["bd","Baidu","ERNIE","CN"],
+ ["db","ByteDance","Doubao","CN"],["xa","xAI","Grok","US"],["an","Anthropic","Claude","US"]
+];
+var ROUTE={
+ local:"Run it on your own machine, or rent it from a host through a router such as OpenRouter or OrcaRouter. On your machine nothing gates it but the model's own refusals. Through a router the host's policy applies and your prompts go to the host's country.",
+ cloud:"The lab's own API and apps, its cloud partners, or a router that passes requests through to the lab. The lab's filter applies on every route. Verification is granted per account and may not carry through a router.",
+ vault:"The lab only, after verification."
+};
+var VENDOR={
+ "Anthropic":"Cyber Verification Program. Defense Access takes individuals on Pro, Max or Ultra, with a two-day target. Red Team and Specialized Access need a Console or Enterprise organization. Data retention is required.",
+ "OpenAI":"Daybreak. Blue: a person applies at chatgpt.com/cyber with a paid plan, an identity check and a FIDO2 hardware key. Red: business and enterprise organizations only. Daybreak has to be switched on per request.",
+ "Google":"Fairwind Program, for vetted organizations: governments, critical infrastructure operators and core technology platforms. No track for individuals is stated. Standard models keep their cyber-offense safeguards.",
+ "xAI":"No open application. Your Sep 29 research found invite-only access for select security partners. xAI's policy page refused my reader.",
+ "Meta":"No verification program found. Meta's use-policy page showed the Llama 2 text: it bans creating malicious code and has no carve-out for security work.",
+ "Microsoft":"MAI-Cyber-1-Flash ships inside Microsoft's MDASH product. A draft code of conduct allows defensive work and sets fixed limits on offense.",
+ "DeepSeek":"No gate found. Canada restricted the DeepSeek app on federal devices in February 2025. DeepSeek's own API stores data in China.",
+ "Zhipu":"No gate found. Zhipu is reported to be on the US Entity List."
+};
+var SRC=[
+ ["Anthropic",[["Cyber Verification Program page","https://support.claude.com/en/articles/14604842-real-time-cyber-safeguards-on-claude"],["Models overview","https://platform.claude.com/docs/en/models/overview.md"]]],
+ ["OpenAI",[["Daybreak help page","https://help.openai.com/en/articles/20001258-openai-daybreak-trusted-access-for-cyber-overview"],["Cyber safety docs","https://learn.chatgpt.com/docs/cyber-safety"]]],
+ ["Google",[["Get started with Gemini 4","https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/get-started-with-gemini-4"],["Generative AI use policy","https://policies.google.com/terms/generative-ai/use-policy"],["Cloud Security Alliance on gated access","https://labs.cloudsecurityalliance.org/research/csa-research-note-trusted-defender-access-governance-2026100/"],["Gemma","https://en.wikipedia.org/wiki/Gemma_(language_model)"]]],
+ ["Routers",[["OpenRouter: in-region routing","https://openrouter.ai/blog/announcements/us-in-region-routing"],["OpenRouter: zero data retention","https://openrouter.ai/docs/guides/features/zdr.md"],["OrcaRouter docs","https://docs.orcarouter.ai/introduction"]]],
+ ["Local models and hardware",[["Best open source LLMs, Nov 2026","https://www.morphllm.com/best-open-source-llm"],["Open models to run locally","https://huggingface.co/blog/daya-shankar/open-source-llm-models-to-run-locally"],["DGX Spark, Mac Studio and Strix Halo","https://llmhardware.io/guides/dgx-spark-vs-mac-studio-vs-strix-halo"],["Mac Studio M5 Ultra and dual Sparks","https://www.mindstudio.ai/blog/m5-ultra-vs-dual-dgx-spark"],["Nemotron","https://en.wikipedia.org/wiki/Nemotron"],["Open-weight model sizes","https://openrouter.ai/blog/insights/the-open-weight-models-that-matter-june-2026/"]]],
+ ["Evaluations",[["Cybersecurity refusals in AI agents (arXiv 2606.02644)","https://arxiv.org/html/2606.02644v1"],["CAISI assessment of GLM-5.2","https://www.nist.gov/document/caisi-assessment-zais-glm-52"],["Cloud Security Alliance on AISI's open-weight findings","https://labs.cloudsecurityalliance.org/wp-content/uploads/2026/08/CSA_research_note_aisi_open_weight_cyber_capability_gap_20260810-csa-styled.pdf"],["Booz Allen study, via Help Net Security","https://www.helpnetsecurity.com/2026/06/09/chinese-ai-coding-models-security/"]]],
+ ["Chinese labs",[["DeepSeek API news","https://api-docs.deepseek.com/news/news260813"],["Alibaba Model Studio","https://www.alibabacloud.com/help/model-studio/newly-released-models"],["Chinese models list, Nov 2026","https://hongkongaipodcast.com/blog/chinese-ai-models-november-2026"],["Fortune on Kimi K3","https://fortune.com/2026/07/16/moonshots-kimi-k3-pushes-chinese-ai-into-fable-level-territory/"],["Axios on GLM-5.3","https://axios.com/2026/08/14/china-open-source-ai-glm-53"]]],
+ ["Other labs",[["Help Net Security on Muse Wonder","https://www.helpnetsecurity.com/2026/10/13/meta-muse-wonder-full-models/"],["Meta AI use policy","https://developer.meta.com/ai/use-policy/"],["SecurityWeek on Microsoft's MAI code","https://www.securityweek.com/microsoft-ai-code-of-conduct-sets-cyberattack-boundaries-chain-of-command-safety-constraints/amp/"],["xAI news","https://x.ai/news"]]],
+ ["Pictures, video and sound",[["Best AI image models, Nov 2026","https://www.teamday.ai/blog/best-ai-image-models-2026"],["Image generators compared","https://dupple.com/learn/best-ai-image-generators"],["Best AI video models, Nov 2026","https://www.marktechpost.com/2026/11/13/best-ai-video-generation-models-2026/"],["Video generators, free and paid","https://tecadmin.net/best-ai-video-generators/"],["Open-weight video models you can run","https://aivideosensei.com/guides/open-weight-ai-video-models"],["Gemini usage limits","https://www.ai-toolbox.co/gemini-management-and-productivity/gemini-usage-limits-2026"],["Free video with Gemini and Flow","https://www.ai-toolbox.co/gemini-management-and-productivity/how-to-make-ai-videos-gemini-flow-2026"],["Is Grok Imagine free","https://www.roborhythms.com/is-grok-imagine-free/"],["Text to speech tools compared","https://dupple.com/learn/best-ai-text-to-speech"],["Suno, Udio and Lyria compared","https://tech-insider.org/ca/suno-v6-vs-udio-vs-google-lyria-3-5-2026"],["ACE-Step","https://arxiv.org/html/2506.00045v1"],["AI 3D model generators","https://www.krea.ai/blog/best-ai-3d-model-generators-2026"],["Image to 3D tools","https://all3dp.com/2/ai-generated-3d-model-best-tools/"]]],
+ ["Law",[["CTV on Canada's DeepSeek device restriction","https://www.ctvnews.ca/politics/article/ai-chatbot-from-chinese-firm-deepseek-restricted-from-some-government-phones/"]]]
+];
+
+var PROBE="No published rule and no evaluation found. A short run of harmless defensive probes would settle it.";
+var LOCAL="Run it on your own machine and ask. A local test touches no account and costs nothing.";
+var PORTAL="The Verification Portal, once you are approved.";
+var GROK="xAI's policy page refused my reader and no evaluation covers Grok. You opening the page, or a probe run.";
+var OLD="Covered by the earlier single-level program. The current tiers do not list it.";
+/* element: [family, shell, symbol, size, next isotope expected, what settles it, isotopes]
+   isotope: [name, version, codes for the three jobs alone, grades, note, released, neighbour for predictions] */
+var E=[
+ ["nv",2,"Nl","30B, 3B active","","",[["Nemotron 3.5 Lightning","3.5","GGG","ccc","Listed by one roundup. No evaluation found.","2026",""]]],
+ ["nv",3,"Ns","120B","","",[["Nemotron 3 Super","3","GNN","cpr","Study: it refused 3% of web-testing tasks and solved 2%. It says yes and cannot do the job.","Mar 2026","its own offense result"]]],
+ ["nv",4,"Nu","550B, 55B active","","",[["Nemotron 3 Ultra","3","GGG","ccc","Open weights under NVIDIA's OpenMDW licence. OpenRouter serves it from US data centres.","2026",""]]],
+
+ ["ds",4,"Df","284B to 552B","","",[["DeepSeek V4.1-Flash","4.1","GNN","cpp","Listed at 552B by one source, MIT licence.","Oct 2026","DeepSeek V4-Pro"],["DeepSeek V4-Flash","V4","GNN","cpp","284B, 13B active. About 167 GB as shipped.","Apr 2026","DeepSeek V4-Pro"]]],
+ ["ds",5,"Dp","1.6T","","",[["DeepSeek V4-Pro","V4","GNN","ctt","Open weights, MIT licence. UK AISI ran its cyber tests on it at about $0.28 a task; a search summary says those tests were largely unimpeded by safeguards. OpenRouter serves it from US data centres.","Apr 2026 preview",""]]],
+ ["ds",10,"Dc","","","A DeepSeek page that names it. Nothing else was found.",[["DeepSeek V4.1 Flash Cyber","4.1","UUU","---","One aggregator listing, Oct 29.","Oct 2026",""]]],
+
+ ["ki",5,"Ki","2.8T","","",[["Kimi K3","3","GNN","ctt","Open weights since Jul 27, about 1.56 TB. UK and US evaluators: its safeguards did not block exploit development or offensive operations. ExploitBench 32.2 in press reports. OpenRouter serves it from US data centres.","Jul 2026",""],["Kimi K3.1 Pro","3.1","GNN","cpp","Launched Oct 23. One leaderboard lists it as open weights at 2.8T; whether the weights are out was not confirmed.","Oct 2026","Kimi K3"]]],
+
+ ["gl",4,"Gl","753B, 40B active","","",[["GLM-5.3","5.3","GNN","cpp","Open weights, released Aug 28 after a two-week hold. Axios: 84.5% on CyberGym. A tight fit at 512 GB.","Aug 2026","GLM-5.2"],["GLM-5.2","5.2","GNN","crr","US CAISI: it refused most plainly malicious requests and never refused in ten agentic exploit-development tasks. ExploitBench 21.4. MIT licence. OpenRouter serves it from US data centres.","Jun 2026",""],["GLM-5","5","YUU","a--","February release. Whether its weights are open was not checked.","Feb 2026",""]]],
+
+ ["mx",4,"Mx","428B, 23B active","","",[["MiniMax M3","M3","GGG","ccc","Listed among open-weight models. In one study the older M2.5 repeatedly refused to security-audit code for a US weapons system.","Jun 2026",""]]],
+
+ ["hy",1,"Hs","1.8B","","",[["Hunyuan HY-1.8B","1.8B","GGG","ccc","A compressed 2-bit model built for phones.","2026",""]]],
+ ["hy",5,"Hy","size not found","","",[["Hunyuan Hy4","4","GGG","ccc","Launched Nov 4. Preview weights under Apache 2.0. Its size was not found, so its shell is assumed.","Nov 2026",""]]],
+
+ ["qw",1,"Qs","4B","","",[["Qwen3.5 4B","3.5","GGG","ccc","Small open Qwen under Apache 2.0. About 6 GB, per your records.","2026",""]]],
+ ["qw",2,"Qw","27B","","",[["Qwen3.8-27B","3.8","GGG","ccc","Dense 27B under Apache 2.0, about 15 to 18 GB. One roundup calls it the strongest model that fits one consumer GPU.","2026",""],["Qwen3.6-35B-A3B","3.6","GGG","ccc","The local model of the 3.6 family.","Apr 2026",""]]],
+ ["qw",4,"Qx","397B, 17B active","","",[["Qwen3.5-397B","3.5","GGG","ccc","Open multimodal flagship of February 2026.","Feb 2026",""]]],
+ ["qw",5,"Qg","2.4T, 95B active","","",[["Qwen3.8 (open)","3.8","GGG","ccc","Open-weight flagship series on Alibaba's Model Studio page.","Aug 2026",""]]],
+ ["qw",6,"Qf","","",PROBE,[["Qwen3.6 Flash","3.6","YUU","a--","Speed tier.","Apr 2026, assumed",""]]],
+ ["qw",7,"Qp","","",PROBE,[["Qwen3.6-Plus","3.6","YUU","a--","April 2026 flagship with a one-million-token window.","Apr 2026",""]]],
+ ["qw",9,"Qm","","",PROBE,[["Qwen4-Max","4","YUU","a--","Launched Nov 16 per aggregators, hosted only.","Nov 2026",""],["Qwen3.6-Max-Preview","3.6","YUU","a--","Hosted only, no open weights.","Apr 2026",""]]],
+
+ ["me",3,"Ls","109B","","",[["Llama 4 Scout","4","GGG","ccc","Open weights under Meta's community licence. Meta's Llama policy bans creating malicious code.","2025",""]]],
+ ["me",4,"Lv","400B","","",[["Llama 4 Maverick","4","GGG","ccc","No open successor yet, per one list. Meta's model menu also names a Muse Spark Open; its size and licence were not read.","2025",""]]],
+ ["me",7,"Sp","","",PROBE,[["Muse Spark 1.3","1.3","YUU","a--","Closed model behind Meta AI. Its tier is assumed.","2026, assumed",""]]],
+ ["me",8,"Wo","","",PROBE,[["Muse Wonder","","YYU","tt-","Press: Meta says it supports defensive security work such as finding flaws in code.","Oct 2026",""]]],
+ ["me",9,"Wf","","",PROBE,[["Muse Wonder Full","","YYU","tt-","Press: it supports defensive security work and refuses help with harmful acts.","Oct 2026",""]]],
+
+ ["ms",1,"Pm","3.8B","","",[["Phi-4-mini","4","GGG","ccc","One guide recommends it for weak hardware.","2025",""]]],
+ ["ms",2,"Ph","14B","","",[["Phi-4","4","GGG","ccc","The newest Phi found.","2025",""]]],
+ ["ms",9,"Ma","","",PROBE,[["MAI-Thinking-1","1","YUU","a--","Public preview in Microsoft Foundry since Aug 12.","Aug 2026",""]]],
+ ["ms",10,"Mc","","","",[["MAI-Cyber-1-Flash","1","PPP","ttt","Delivered inside Microsoft's MDASH product. No application is described; the gate is the contract.","Aug 2026",""]]],
+
+ ["go",1,"Gs","4B","","",[["Gemma 4 4B","4","GGG","ccc","Apache 2.0. A 2B sibling exists.","Apr 2026",""]]],
+ ["go",2,"Ge","31B","","",[["Gemma 4 31B","4","GGG","ccc","About 17 GB, Apache 2.0. Siblings: 26B-A4B and 12B.","Apr 2026",""]]],
+ ["go",6,"H","","","",[["Gemini 4 Hydrogen","4","YNP","apt","Everyday coding and agent model, with a free API tier.","Nov 2026","Gemini 4 Neon (yours)"],["Gemini 3.5 Flash","3.5","YNN","app","A study tested Gemini 3 Flash: 70% refusal as a bare prompt, 0% with an authorized scope.","mid-2026, assumed","Gemini 3.1 Pro"]]],
+ ["go",7,"Ne","","","",[["Gemini 4 Neon","4","YNP","ayt","In Antigravity for Pro and Ultra subscribers. Your words today: Google has been much kinder with its guardrails in your work.","Nov 2026",""]]],
+ ["go",8,"Ar","","","",[["Gemini 4 Argon","4","YNP","apt","A version without cyber guardrails goes to Fairwind partners. The standard version keeps them.","Oct 2026","Gemini 4 Neon (yours)"]]],
+ ["go",9,"C","","","",[["Gemini 4 Carbon","4","YNP","apt","Strongest reasoning model. Press: 54.8% on ExploitGym.","Nov 2026","Gemini 4 Neon (yours)"],["Gemini 3.1 Pro (preview)","3.1","YNN","apr","Study: refused 13% of web-testing tasks as a bare prompt and 5% or fewer with an authorized scope.","Feb 2026, assumed","its own offense result"]]],
+ ["go",10,"Fc","","","",[["Gemini 3.8 Flash Cyber","3.8","PPP","ttt","Fairwind partners only. Two sources call it 3.8, one calls it 3.5.","Sep 2026",""]]],
+
+ ["oa",2,"Os","20B","","",[["gpt-oss-20b","20b","GGG","ccc","Apache 2.0, from 2025. No successor found.","2025",""]]],
+ ["oa",3,"Go","120B","","",[["gpt-oss-120b","120b","GGG","ccc","Apache 2.0, from 2025. OpenRouter serves it from US data centres.","2025",""]]],
+ ["oa",6,"Lu","","","",[["GPT-6 Luna","6","YVO","rrr","OpenAI's table: reduced refusals under Blue and Red.","Sep 2026, assumed",""],["GPT-5.6 Luna","5.6","YVO","app","Not named in OpenAI's table.","mid-2026, assumed","GPT-5.6 Sol"]]],
+ ["oa",7,"Te","","","",[["GPT-6.1 Terra","6.1","YOO","rrr","Reduced refusals only for approved Red users with Daybreak switched on.","Oct 2026, assumed",""]]],
+ ["oa",8,"Sl","","","",[["GPT-6.2 Sol","6.2","YOO","rrr","OpenAI's table: standard refusals under Blue, reduced only under Red.","Nov 2026",""],["GPT-6.1 Sol","6.1","YOO","rrr","Standard under Blue, reduced only under Red.","Oct 2026, assumed",""],["GPT-6 Sol","6","YVO","rrr","Reduced refusals under Blue and Red.","Sep 2026, assumed",""],["GPT-5.6 Sol","5.6","YVO","rrr","Listed with the earlier mainline models: reduced refusals under Blue and Red.","mid-2026, assumed",""]]],
+ ["oa",9,"As","","Astra under Blue. OpenAI's help page says it is working on reduced refusals for Astra at the tier a person can get. Read.","",[["GPT-6.2 Astra","6.2","YOO","rrr","OpenAI's table: standard refusals under Blue, reduced only under Red.","Nov 2026",""],["GPT-6 Astra","6","YOO","rrr","Your records, Sep 29: its cyber check held back part of a defensive review of your own tool.","Sep 2026",""]]],
+ ["oa",10,"Cy","","","",[["GPT-6 Cyber","6","OOO","rrr","Red only, plus a separate approval.","Nov 2026, told",""],["GPT-5.6 Cyber","5.6","OOO","rrr","Red only. Individuals cannot apply for Red.","2026",""],["GPT-5.5-Cyber","5.5","OOO","rrr","Existing approved access only. Its API id is removed on Feb 1 2027.","2026",""]]],
+
+ ["bd",9,"Er","","",PROBE,[["ERNIE 5.0","5.0","YUU","a--","Baidu's flagship in the sources found.","Jan 2026",""]]],
+
+ ["db",6,"St","","",PROBE,[["Doubao-Seed-2.1-Turbo","2.1","YUU","a--","Lightweight tier.","Jun 2026",""]]],
+ ["db",9,"Sd","","",PROBE,[["Doubao-Seed-2.1-Pro","2.1","YUU","a--","Newest Doubao flagship found.","Jun 2026",""],["Doubao-Seed-2.0-Pro","2.0","YUU","a--","Released Feb 14.","Feb 2026",""]]],
+
+ ["xa",7,"Gb","","",GROK,[["Grok Build 0.1","0.1","YUP","a-y","xAI's coding tool model. Its tier is assumed.","2026, assumed",""]]],
+ ["xa",9,"Gk","","Grok 5. xAI's stated target is before the end of 2026. Told.",GROK,[["Grok 4.6","4.6","YUP","a-y","Newest on xAI's news page, Aug 14.","Aug 2026",""],["Grok 4.5","4.5","YUP","a-y","Coding-focused flagship from mid-2026.","mid-2026",""]]],
+
+ ["an",6,"Ha","","","Anthropic's page naming Haiku, or one harmless probe.",[["Claude Haiku 5.5","5.5","YUU","a--","The safeguards article is said to cover Opus and Sonnet class models only.","Oct 2026",""],["Claude Haiku 4.5","4.5","YNN","app","Same generation as Sonnet 4.5.","Oct 2025","Sonnet 4.5"]]],
+ ["an",7,"So","","",PORTAL,[["Claude Sonnet 5.5","5.5","YVO","rrr","Named in every tier of the Cyber Verification Program.","Sep 2026",""],["Claude Sonnet 5","5","YVU","ap-",OLD+" Press: Anthropic's apps send blocked Sonnet 5.5 cyber requests here.","Jul 2026, assumed","Sonnet 5.5"],["Claude Sonnet 4.6","4.6","YNN","app","Not named on the program page.","Feb 2026","Opus 4.6 (yours) and Sonnet 4.5 (read)"],["Claude Sonnet 4.5","4.5","YNN","apr","Study: 0% refusal with an authorized scope, 100% as a bare prompt against localhost.","Sep 2025","its own offense result"]]],
+ ["an",8,"Op","","",PORTAL,[["Claude Opus 5.5","5.5","YVO","rrr","Named in every tier of the Cyber Verification Program. Verified users may still see some refusals on allowed work, the page says.","Sep 2026",""],["Claude Opus 5","5","YVU","ap-",OLD,"Jul 2026","Opus 5.5"],["Claude Opus 4.8","4.8","YVU","ap-",OLD+" Fable hands blocked cyber requests to it, per Anthropic's launch text in your records. ExploitBench 38.1.","mid-2026, assumed","Opus 5.5"],["Claude Opus 4.7","4.7","YVU","ap-",OLD+" Your words, Oct 28: you switched to 4.7, hit cyber flags, then dropped to 4.6.","Apr 2026","Opus 5.5"],["Claude Opus 4.6","4.6","YNN","ayy","Your words, Oct 31: any model higher than Opus 4.6 hits cyber safeguards on your work. Your report today: it does anything, poorly, and hallucinates.","Feb 2026",""],["Claude Opus 4.5","4.5","YNN","apr","Study: 0% refusal on web-testing tasks given with an authorized scope, 85% as a bare prompt against localhost.","Nov 2025","its own offense result"]]],
+ ["an",9,"Fa","","","",[["Claude Fable 5.2","5.2","YBB","ryy","Same underlying model as Mythos 5.2 with extra safeguards. Your words today: the guardrails seem to flag always. The program page lists Mythos, Opus 5.5 and Sonnet 5.5 for verified work, not Fable.","Nov 2026",""],["Claude Fable 5.1","5.1","YBB","rtt","Reported: vulnerability discovery is allowed; exploit development, pen testing and binary scanning are handed to another model.","Sep 2026",""],["Claude Fable 5","5","YBB","rpp","Launch text in your records: cyber requests its filter catches are answered by Opus 4.8.","Jun 2026","Fable 5.1"]]],
+ ["an",10,"My","","",PORTAL,[["Claude Mythos 5.2","5.2","VVO","rrr","Limited availability. The program page lists it in every tier, Defense included. Your records show you reached it through your organization.","Nov 2026",""],["Claude Mythos 5.1","5.1","VVO","rrr","Limited availability. Listed in every tier of the program.","Sep 2026",""],["Claude Mythos 5","5","VUU","r--","Limited availability. The current tiers do not list it.","Jun 2026",""]]]
+];
+/* gaps: [family, shell, symbol, name, codes, basis, how to test] */
+var GAPS=[
+ ["qw",3,"Q?","eka-Qwen: a Spark-class Qwen","GGG","Pattern only. Qwen has open weights in the shells above and below this one. One may already exist that my reading missed.","Alibaba's model pages, for an open Qwen near 100B."],
+ ["ki",4,"K?","Open weights for Kimi K3 Fast","GGG","A lighter Kimi K3 Fast is listed on hosted gateways. No weights were found. Told.","A weights release from Moonshot."],
+ ["xa",10,"G?","A Grok for vetted partners","PPP","Your Sep 29 research: xAI gives select security partners invite-only access to Grok's red-team abilities. No named model or open application was found.","A named model or a program page from xAI."]
+];
+
+/* machines: [shell, column (0 Mac, 1 PC), symbol, name, tile tag, note] */
+var MACH=[
+ [1,1,"La","A laptop or phone","8 GB","Any recent laptop. Enough for the pocket models only."],
+ [2,0,"Mb","MacBook Pro","32 GB+","Apple silicon with unified memory. Holds the 27B to 31B class."],
+ [2,1,"Rx","One gaming GPU","32 GB","An RTX 5090 class card. Fast, but the whole model has to fit on the card."],
+ [3,0,"Ms","Mac Studio, 128 GB","128 GB","Apple silicon with 128 GB of unified memory."],
+ [3,1,"Dx","DGX Spark","128 GB","NVIDIA's desktop box: 128 GB of unified memory at 273 GB/s, with native CUDA tools such as vLLM. Two Sparks do not pool their memory. AMD's Strix Halo boxes are the same class. Told."],
+ [4,0,"Mu","Mac Studio M5 Ultra","512 GB","Told: up to 512 GB and about 1.2 TB/s of memory bandwidth, enough to load a 400B model at 4-bit. Check Apple's configurator."],
+ [4,1,"Gt","GPU tower","multi","A multi-GPU workstation. No source was read for current configurations."],
+ [5,1,"Sv","GPU server","rack","Multi-GPU servers, owned or rented by the hour. The only home for the trillion-parameter open models."]
+];
+/* series below the table: [symbol, name, tile tag, note] */
+var SERIES=[
+ {k:"R",name:"Routes",sub:"How a request reaches a model you do not hold.",items:[
+  ["Ap","The lab's own API or app","lab","The lab's filter applies, and its verification program works here for certain. A Chinese lab's own API runs under Chinese law. Read, told."],
+  ["Or","OpenRouter","router","One key for many hosts. Its US and EU regions keep inference in-region, on Business and Enterprise plans, and a zero-retention setting filters hosts. Its pages do not say whether a lab's verification carries through. Read."],
+  ["Oc","OrcaRouter","router","An OpenAI-compatible gateway to OpenAI, Anthropic, Google, DeepSeek, xAI, Qwen, Kimi and MiniMax at provider prices. Your Oct 25 records: your key works on its regular models. Its policy page did not render for my reader. Read, yours."],
+  ["Vg","Vercel AI Gateway","router","Lists Kimi K3 from US hosts with zero data retention. Told."],
+  ["Fw","Fireworks","host","Serves open weights from US data centres, including the big Chinese-lab models. Sources disagree on whether zero retention is the default. Told."],
+  ["Bt","Baseten","host","One of the US hosts behind OpenRouter's US region for DeepSeek V4 Pro, Kimi K3 and GLM 5.2. Read."],
+  ["Tg","Together","host","Says it hosts DeepSeek models in North America and that DeepSeek receives no traffic from it. Told."],
+  ["Di","DeepInfra","host","A US inference host. Its own blog notes that US hosting changes where prompts are handled, not who built the weights. Told."],
+  ["Bk","Amazon Bedrock","cloud","The lab's filter applies. Anthropic's program is limited here for now. Read."],
+  ["Gc","Google Cloud","cloud","Hosts Gemini and Claude. Anthropic's program needs the project linked and data sharing set up. Read."],
+  ["Fy","Microsoft Foundry","cloud","Hosts Claude and Microsoft's own MAI models. Anthropic's program needs the subscription linked. Read."]
+ ]},
+ {k:"T",name:"Runtimes",sub:"What runs the weights on a machine you hold.",items:[
+  ["Ol","Ollama","easy","One command to pull and run a model. Named in the local guides read."],
+  ["Lm","LM Studio","app","A desktop app for the same job. From your records, not from a page I read."],
+  ["Lc","llama.cpp","engine","The engine under most local tools. Runs quantized models on almost anything."],
+  ["Ml","MLX","Apple","Apple's framework for its own chips. One hardware review says engine choice matters more as models get bigger. Told."],
+  ["Vl","vLLM","server","The server-grade engine. Runs natively on the Spark's CUDA stack. Told."]
+ ]},
+ {k:"C",name:"Catalysts",sub:"Access programs. They do no job themselves and change what a model will do.",items:[
+  ["Da","Defense Access","1 person","Anthropic. Opens defense work on Opus 5.5, Sonnet 5.5 and Mythos. Pro, Max or Ultra; two-day target. Read."],
+  ["Rt","Red Team Access","org","Anthropic. Opens authorized offense. Console or Enterprise organizations, up to 75 users. Read."],
+  ["Sa","Specialized Access","org","Anthropic. Critical-infrastructure testing, reviewed with the US government, up to 25 users. Read."],
+  ["Bl","Daybreak Blue","1 person","OpenAI. Lowers refusals for defense work on GPT-6 Sol, GPT-6 Luna and GPT-5.6 Sol. Needs a paid plan, an identity check and a FIDO2 hardware key. Read."],
+  ["Rd","Daybreak Red","org","OpenAI. Opens the Cyber models and lowers refusals on Astra and the 6.1 and 6.2 models. Business and enterprise only. Read."],
+  ["Fd","Fairwind","org","Google. Governments, critical infrastructure and core technology platforms. Opens Flash Cyber and a guardrail-free Argon. Told."],
+  ["Oa","OrcaRouter security access","router","Your Oct 25 records show a request with a domain check. What it opens was not read. Yours."]
+ ]}
+];
+SERIES[1].items.push(["Cf","ComfyUI","media","The usual way to run open picture, video and music models on your own GPU. Told."]);
+/* media model series, each ordered open to closed: [symbol, name, tile tag, note] */
+var MEDIA=[
+ {k:"I",name:"Picture models",sub:"Make and edit still images.",items:[
+  ["Qi","Qwen-Image 2.1","open","Alibaba. The highest-scoring open-weight picture model on arena boards, per one roundup. Its licence is research and evaluation only, with no commercial use. Told."],
+  ["Sr","Seedream 5.5","hosted","ByteDance. Released Nov 9 2026. One guide says it leads for long chains of edits. Told."],
+  ["Nb","Nano Banana","free","Google. Free Gemini users get Nano Banana 2 at 1K resolution; roundups call it the strongest free option. Told."],
+  ["Mg","Muse Image","hosted","Meta. Listed on Meta's own model menu. Nothing else was read about it."],
+  ["Mi","MAI-Image-2.7","hosted","Microsoft. Reported to lead one editing leaderboard. Told."],
+  ["Gi","GPT Image","hosted","OpenAI. Tops the picture leaderboards in most November roundups, which disagree on the version name (2.5 or 2.6). Told."],
+  ["Gm","Grok Imagine","paid","xAI. Pictures and video in the Grok app. Several sources say free access was switched off in March 2026; they disagree on whether a few free pictures a day remain. Your rulebook: yours to click, not an agent's. Told, yours."],
+  ["Mj","Midjourney","paid","Strongest on style. About $10 to $120 a month, no free tier found, no public API. Your rulebook: you paste the prompts, no agent drives it. Told, yours."]
+ ]},
+ {k:"V",name:"Video models",sub:"Make short clips. Most make a few seconds at a time.",items:[
+  ["Wn","Wan","open","Alibaba. Wan 2.2 is free to run yourself on an 8 to 24 GB card. The hosted Wan 3.0 makes clips up to 30 seconds and leads one leaderboard for video with sound. Told."],
+  ["Hv","HunyuanVideo","open","Tencent. Open weights. Wants about 20 to 24 GB; a squeezed copy runs on less. Told."],
+  ["Mh","MiniMax H3","open","Named by one comparison as a current open-weight starting point for video. Told."],
+  ["Kl","Kling 3.0","free","Kuaishou. Clips up to 15 seconds. Free daily credits, watermarked. Leads the blind-vote boards in one roundup. Your rulebook: no agent drives it. Told, yours."],
+  ["Sc","Seedance 2.5","free","ByteDance. A few free runs on Dreamina. One roundup says clips up to 30 seconds. Told."],
+  ["Ve","Veo 3.1","free","Google. In Flow with about 50 free credits a day; 8-second clips that can be extended. Your rulebook: Flow in Chrome is one an agent may drive. Told, yours."],
+  ["Om","Gemini Omni","free","Google. Replaced Veo inside the Gemini app, where it needs a paid plan. Free in Google Vids and YouTube Create. Clips of 10 to 15 seconds. Told."],
+  ["Rw","Runway Gen-4.5","paid","Clips up to 10 seconds. 125 one-time free credits, then paid. Told."],
+  ["Sx","Sora 2","paid","OpenAI. One roundup says OpenAI shut Sora down; another still lists a plan. Check before counting on it. Told."]
+ ]},
+ {k:"A",name:"Voice models",sub:"Turn written lines into speech.",items:[
+  ["Fh","Fish Audio","hosted","One roundup's pick for cheaper voice cloning. Told."],
+  ["Ct","Cartesia","hosted","One roundup's pick for real-time voice agents. Told."],
+  ["Gv","Grok Voice 3.0","hosted","xAI. On its news page, with speech to speech in the API. Built for talking with Grok, not for narrating a script. Told."],
+  ["El","ElevenLabs","free","The pick for most people in the roundups read. Free for about 10 minutes a month; commercial rights start at the $5 plan. Your rulebook: its API and CLI with your own voice are fine for an agent, the web app is yours to click. Told, yours."]
+ ]},
+ {k:"M",name:"Music models",sub:"Make songs and scores.",items:[
+  ["Ac","ACE-Step 1.5","open","Open source. A full song in under 10 seconds on an RTX 3090, with a ComfyUI node. Its licence was not checked. Told."],
+  ["Yu","YuE","open","Open source, aimed at full-length songs with lyrics. Its licence was not checked. Told."],
+  ["Ly","Lyria 3.5","free","Google. In Gemini, AI Studio and Vids. Free clips are capped at 30 seconds, and commercial rights are listed only on paid plans. Told."],
+  ["Ud","Udio","free","Free at about 10 credits a day. One review says that after its 2026 change you cannot download what you make. Told."],
+  ["Em","ElevenLabs Music","paid","Described as trained on licensed music, with label and publisher deals. Told."],
+  ["Su","Suno","free","The pick for songs with vocals. About 50 free credits a day; free songs carry no commercial rights. Your rulebook: an agent cannot press Create. Told, yours."]
+ ]},
+ {k:"D",name:"3D models",sub:"Turn a picture or a description into a 3D object.",items:[
+  ["Hd","Hunyuan3D","open","Tencent. Open weights; one guide calls it the best free option. Its licence was not checked. Told."],
+  ["Tr","TRELLIS.2","open","A Microsoft research model that reviewers name as a frontier option. Told."],
+  ["Rn","Rodin","hosted","Hyper3D. One review ranks it first for quality. Told."],
+  ["Tp","Tripo","hosted","One review ranks it first overall and praises its clean meshes. Your rulebook: paid output is fine; its Studio and API are your call. Told, yours."],
+  ["Me","Meshy","free","The most polished mainstream option in several reviews. 300 free credits a month; paid plans about $20 to $60. Your rulebook: an agent may use its API with your key; the web app is yours to click. Told, yours."]
+ ]}
+];
+SERIES=MEDIA.concat(SERIES);
+var KIND={model:"Model line",mach:"Machine",R:"Route",T:"Runtime",C:"Catalyst",I:"Picture model",V:"Video model",A:"Voice model",M:"Music model",D:"3D model"};
+/* compounds: [element symbols, name, result codes for the three jobs, where prompts go, note] */
+var COMP=[
+ [["Fa","Ap"],"Fable 5.2 on its own","YBB","Anthropic","What you are using now. Your words today: the guardrails seem to flag always."],
+ [["Op","Ap","Da"],"Opus 5.5 with Defense Access","YYB","Anthropic","Defense work opens once the application is approved. Authorized offense still needs an organization. Read."],
+ [["My","Ap","Da"],"Mythos 5.2 with Defense Access","YYB","Anthropic","The program page lists Mythos in the Defense tier. Your Nov 16 records: in Anthropic's own test Defense Access blocked 46 of 50 offensive trials. Read, yours."],
+ [["My","Ap","Rt"],"Mythos 5.2 with Red Team Access","YYY","Anthropic","Organizations only. The same records: Red Team Access blocked none of the 50. Read, yours."],
+ [["Sl","Ap","Bl"],"GPT-6 Sol with Daybreak Blue","YYB","OpenAI","Works on the GPT-6 Sol isotope, not on 6.1 or 6.2. Read."],
+ [["Cy","Ap","Rd"],"GPT-6 Cyber with Daybreak Red","YYY","OpenAI","Organizations only, plus a separate approval. Read."],
+ [["Ne","Ap"],"Gemini 4 Neon in Antigravity","YNB","Google","Your words: kinder guardrails. Standard Gemini 4 keeps its cyber-offense safeguards. Yours, told."],
+ [["Dp","Or","Bt"],"DeepSeek V4-Pro through OpenRouter's US region","YNN","a US host","The host's policy applies, not DeepSeek's. Region lock needs a Business or Enterprise plan. Read, told."],
+ [["Gl","Oc"],"GLM-5.3 through OrcaRouter","YNN","the host OrcaRouter picks","The weights did not refuse exploit-development tasks in CAISI's test of 5.2. The host's own policy was not read, so jobs 2 and 3 are predicted."],
+ [["Qw","Ol","Mb"],"Qwen3.8-27B on a MacBook Pro with Ollama","GGG","nowhere","Nothing leaves the machine. One roundup calls it the strongest model that fits one consumer GPU; it is still far below the frontier."],
+ [["Go","Vl","Dx"],"gpt-oss-120b on a DGX Spark with vLLM","GGG","nowhere","Fits in 128 GB. OpenAI's open models are trained to refuse a good deal, so test it before relying on it."],
+ [["Gl","Ml","Mu"],"GLM-5.3 on a Mac Studio M5 Ultra with MLX","GNN","nowhere","A tight fit at 512 GB. No service gate, and the 5.2 weights did not refuse in CAISI's test."],
+ [["Ki","Vl","Sv"],"Kimi K3 on a GPU server with vLLM","GNN","nowhere","About 1.56 TB of weights. Evaluators found its safeguards did not block offensive work."]
+];
+/* uses, in reading order: [name, one line] */
+var USES=[
+ ["Talk through a story","A chat model as a creative partner."],
+ ["Make a picture","A character, a place, a cover."],
+ ["Make a short video","A few seconds per clip; join clips for more."],
+ ["Add a voice","Narration or a character's lines."],
+ ["Add music","A song or a score."],
+ ["Make a 3D model","An object from a picture or a description."],
+ ["Security work","The three jobs on the bands. Results are for a person working alone."]
+];
+/* other compounds: [use, level, element symbols, name, cost, where prompts go, note] */
+var COMP2=[
+ ["Talk through a story","starter",["Gk","Ap"],"Grok, in the app they already have","free","xAI","Where your starter kit's paste is meant to run. It may not remember a new chat, which is what the kit's save word is for."],
+ ["Talk through a story","starter",["H","Ap"],"Gemini, on the free plan","free","Google","Free users reach Gemini 4 Hydrogen through Auto. Told."],
+ ["Talk through a story","pro",["Qw","Ol","Mb"],"Qwen3.8-27B on your own laptop","free after the hardware","nowhere","Nothing leaves the machine, so drafts stay private. Weaker than the hosted models."],
+
+ ["Make a picture","starter",["Nb","Ap"],"Nano Banana in the free Gemini app","free","Google","Free users get 1K pictures. Roundups call it the strongest free option. Told."],
+ ["Make a picture","starter",["Gm","Ap"],"Grok Imagine, if they pay for Grok","paid plan","xAI","Sources say free access ended in March 2026 and disagree on whether a few free pictures a day remain. Told."],
+ ["Make a picture","pro",["Gi","Ap"],"GPT Image in ChatGPT","plan not read","OpenAI","Top of most picture leaderboards this month. Told."],
+ ["Make a picture","pro",["Mj"],"Midjourney","about $10 a month and up","Midjourney","The style pick. No free tier was found. Told."],
+ ["Make a picture","pro",["Qi","Cf","Rx"],"Qwen-Image on a gaming GPU with ComfyUI","free after the hardware","nowhere","Research licence only: no commercial use. Told."],
+
+ ["Make a short video","starter",["Ve","Ap"],"Veo 3.1 in Google Flow","about 50 free credits a day","Google","Eight-second clips that can be extended. Told."],
+ ["Make a short video","starter",["Om","Ap"],"Gemini Omni in Google Vids or YouTube Create","free","Google","Free there, but not in the free Gemini app. Told."],
+ ["Make a short video","starter",["Kl","Ap"],"Kling 3.0","free daily credits, watermarked","Kuaishou, in China","Clips up to 15 seconds. Told."],
+ ["Make a short video","starter",["Gm","Ap"],"Grok Imagine video, if they pay for Grok","paid plan","xAI","Most sources agree free accounts get no video. Told."],
+ ["Make a short video","pro",["Sc","Ap"],"Seedance 2.5 on Dreamina","a few free runs, then paid","ByteDance, in China","One roundup says clips up to 30 seconds. Told."],
+ ["Make a short video","pro",["Wn","Cf","Rx"],"Wan 2.2 on a gaming GPU with ComfyUI","free after the hardware","nowhere","Runs on 8 to 24 GB cards. Slower to set up than any app. Told."],
+
+ ["Add a voice","starter",["El","Ap"],"ElevenLabs","about 10 free minutes a month","ElevenLabs","Commercial rights start at the $5 plan. Told."],
+ ["Add a voice","pro",["Fh","Ap"],"Fish Audio","paid","Fish Audio","A cheaper pick for cloning a voice. A real person's voice needs their yes. Told."],
+
+ ["Add music","starter",["Su","Ap"],"Suno","about 50 free credits a day","Suno","Free songs are for personal use only. Told."],
+ ["Add music","starter",["Ly","Ap"],"Lyria in the Gemini app","free, clips capped at 30 seconds","Google","Treat free songs as personal use. Told."],
+ ["Add music","pro",["Ac","Cf","Rx"],"ACE-Step on a gaming GPU with ComfyUI","free after the hardware","nowhere","A full song in seconds on an RTX 3090. Its licence was not checked. Told."],
+
+ ["Make a 3D model","starter",["Me","Ap"],"Meshy","300 free credits a month","Meshy","The most polished mainstream option in several reviews. Told."],
+ ["Make a 3D model","pro",["Hd","Rx"],"Hunyuan3D on a gaming GPU","free after the hardware","nowhere","Open weights. Its licence was not checked. Told."]
+];
+
+function el(tag,cls,txt){var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e;}
+function famOf(k){for(var i=0;i<FAMS.length;i++) if(FAMS[i][0]===k) return FAMS[i]; return null;}
+function gradeOf(iso,j){var c=iso.codes.charAt(j); if(c==="U") return "n"; var g=iso.g.charAt(j); return g==="-"?"a":g;}
+function orgCode(c){return c==="O"?"V":c;}
+
+var elements=E.map(function(e,i){
+  var f=famOf(e[0]);
+  return {kind:"model",i:i,no:0,fam:e[0],lab:f[1],country:f[3]==="US"?"United States":"China",shell:e[1],sym:e[2],size:e[3],next:e[4],settle:e[5],
+    iso:e[6].map(function(s){return {name:s[0],ver:s[1],codes:s[2],g:s[3],note:s[4],date:s[5],nb:s[6]};})};
+});
+var gaps=GAPS.map(function(g,i){return {kind:"gap",gi:i,fam:g[0],lab:famOf(g[0])[1],shell:g[1],sym:g[2],name:g[3],codes:g[4],basis:g[5],test:g[6]};});
+var machines=MACH.map(function(m){return {kind:"mach",no:0,shell:m[0],col:m[1],sym:m[2],name:m[3],tag:m[4],note:m[5]};});
+var others=[]; SERIES.forEach(function(S){S.items.forEach(function(it){others.push({kind:S.k,no:0,sym:it[0],name:it[1],tag:it[2],note:it[3]});});});
+var compounds=[];
+COMP2.forEach(function(c){compounds.push({use:c[0],level:c[1],syms:c[2],name:c[3],codes:"",cost:c[4],where:c[5],note:c[6],pred:[false,false,false]});});
+COMP.forEach(function(c,i){compounds.push({use:"Security work",level:"",syms:c[0],name:c[1],codes:c[2],cost:"",where:c[3],note:c[4],pred:(i===8)?[false,true,true]:[false,false,false]});});
+compounds.forEach(function(c,i){c.ci=i;});
+/* atomic numbers: reading order, shell by shell, then each series */
+(function(){var n=0;
+  SHELLS.forEach(function(s){
+    [0,1].forEach(function(c){machines.forEach(function(m){if(m.shell===s.n&&m.col===c){n++;m.no=n;}});});
+    FAMS.forEach(function(f){elements.forEach(function(x){if(x.shell===s.n&&x.fam===f[0]){n++;x.no=n;}});});
+  });
+  others.forEach(function(o){n++;o.no=n;});
+})();
+var bySym={}; elements.concat(machines,others).forEach(function(x){bySym[x.sym]=x;});
+var nIso=0; elements.forEach(function(x){nIso+=x.iso.length;});
+document.getElementById("n-el").textContent=String(elements.length);
+document.getElementById("n-iso").textContent=String(nIso);
+
+var state={pick:null,hl:null,cmp:-1};
+elements.forEach(function(x){ if(x.iso[0].name==="Claude Opus 5.5") state.pick=x; });
+
+function bands(codes,preds){
+  var b=el("span","bands");
+  for(var j=0;j<3;j++){var c=codes.charAt(j); b.appendChild(el("span","s-"+c+(preds[j]?" pred":""),c));}
+  return b;
+}
+function pickIt(x){state.pick=x; state.hl=null; state.cmp=-1; paint();}
+function tile(x){
+  var face=x.iso[0], preds=[0,1,2].map(function(j){return gradeOf(face,j)==="p";});
+  var b=el("button","el"); b.type="button"; b.dataset.sym=x.sym;
+  b.appendChild(bands(face.codes,preds));
+  b.appendChild(el("span","no",String(x.no)));
+  if(x.next) b.appendChild(el("span","nx","+1"));
+  b.appendChild(el("span","sym",x.sym));
+  b.appendChild(el("span","ver",face.ver||" "));
+  var label=face.name+". "+JOBS.map(function(j,ji){return j+": "+ST[face.codes.charAt(ji)]+(preds[ji]?" (predicted)":"");}).join(". ")+"."+(x.iso.length>1?" "+(x.iso.length-1)+" older versions.":"");
+  b.setAttribute("aria-label",label); b.title=label;
+  b.addEventListener("click",function(){pickIt(x);});
+  return b;
+}
+function gapTile(g){
+  var b=el("button","el gap"); b.type="button"; b.dataset.sym="gap"+g.gi;
+  b.appendChild(bands(g.codes,[true,true,true]));
+  b.appendChild(el("span","no","?"));
+  b.appendChild(el("span","sym",g.sym));
+  b.appendChild(el("span","ver","gap"));
+  var label="Gap: "+g.name+". Predicted.";
+  b.setAttribute("aria-label",label); b.title=label;
+  b.addEventListener("click",function(){pickIt(g);});
+  return b;
+}
+function plainTile(o){
+  var b=el("button","el plain k-"+o.kind); b.type="button"; b.dataset.sym=o.sym;
+  b.appendChild(el("span","no",String(o.no)));
+  b.appendChild(el("span","sym",o.sym));
+  b.appendChild(el("span","ver",o.tag));
+  var label=KIND[o.kind]+": "+o.name+".";
+  b.setAttribute("aria-label",label); b.title=label;
+  b.addEventListener("click",function(){pickIt(o);});
+  return b;
+}
+
+var pt=document.getElementById("pt"), FC=5;  /* first family column */
+(function(){
+  var mh=el("div","fam machhead"); mh.appendChild(el("i",null,"MAC · PC")); mh.appendChild(el("b",null,"Machines")); mh.appendChild(el("span",null,"what you hold"));
+  mh.style.gridRow="1"; pt.appendChild(mh);
+  FAMS.forEach(function(f,ci){
+    var h=el("div","fam"); h.appendChild(el("i",null,f[3])); h.appendChild(el("b",null,f[1])); h.appendChild(el("span",null,f[2]));
+    h.style.gridRow="1"; h.style.gridColumn=String(ci+FC); h.title=f[1]+": "+f[2]; pt.appendChild(h);
+  });
+  var row=1, firstCloud=0;
+  SHELLS.forEach(function(s){
+    if(s.n===6){
+      row++; var c=el("div","custody"); c.style.gridRow=String(row);
+      c.appendChild(el("span",null,"Above: you can hold the weights")); c.appendChild(el("i")); c.appendChild(el("span",null,"Below: the lab holds them")); pt.appendChild(c);
+    }
+    row++; if(s.n===6) firstCloud=row;
+    var lab=el("div","shell"); lab.appendChild(el("b",null,String(s.n)));
+    var d=el("div"); d.appendChild(el("strong",null,s.name)); d.appendChild(el("em",null,s.cap)); d.appendChild(el("span",null,s.ex)); lab.appendChild(d);
+    lab.style.gridRow=String(row); lab.style.gridColumn="1"; pt.appendChild(lab);
+    machines.forEach(function(m){ if(m.shell===s.n){var b=plainTile(m); b.style.gridRow=String(row); b.style.gridColumn=String(m.col+2); pt.appendChild(b);} });
+    FAMS.forEach(function(f,ci){
+      elements.forEach(function(x){ if(x.shell===s.n&&x.fam===f[0]){var b=tile(x); b.style.gridRow=String(row); b.style.gridColumn=String(ci+FC); pt.appendChild(b);} });
+      gaps.forEach(function(g){ if(g.shell===s.n&&g.fam===f[0]){var b=gapTile(g); b.style.gridRow=String(row); b.style.gridColumn=String(ci+FC); pt.appendChild(b);} });
+    });
+  });
+  var lb=el("div","labbox","The lab's servers. Reach them by a route, below."); lb.style.gridRow=firstCloud+" / "+(row+1); pt.appendChild(lb);
+
+  var host=document.getElementById("series");
+  SERIES.forEach(function(S){
+    var ser=el("div","series"), sl=el("div","series-label");
+    sl.appendChild(el("b",null,S.name)); sl.appendChild(el("span",null,S.sub));
+    var cells=el("div","series-cells");
+    others.forEach(function(o){ if(o.kind===S.k) cells.appendChild(plainTile(o)); });
+    ser.appendChild(sl); ser.appendChild(cells); host.appendChild(ser);
+  });
+})();
+
+function mini(codes,preds){
+  var m=el("span","mini");
+  for(var j=0;j<3;j++){var c=codes.charAt(j); m.appendChild(el("span","s-"+c+(preds&&preds[j]?" pred":""),c));}
+  return m;
+}
+function chipClass(sym){var x=bySym[sym]; return x.kind==="model"?"s-U":"k-"+x.kind;}
+function formula(c){
+  var f=el("span","formula");
+  c.syms.forEach(function(s,i){ if(i) f.appendChild(el("i",null,"·")); f.appendChild(el("span",chipClass(s),s)); });
+  return f;
+}
+/* compounds, grouped by use */
+(function(){
+  var box=document.getElementById("compounds");
+  USES.forEach(function(u){
+    var list=compounds.filter(function(c){return c.use===u[0];}); if(!list.length) return;
+    var h=el("div","use-head"); h.appendChild(el("b",null,u[0])); h.appendChild(el("span",null,u[1]+" "+list.length+" setups.")); box.appendChild(h);
+    var g=el("div","compounds");
+    list.forEach(function(c){
+      var b=el("button","cmp"); b.type="button"; b.dataset.c=c.ci;
+      b.appendChild(formula(c));
+      b.appendChild(el("span","cmp-name",c.name));
+      var r=el("span","cmp-row");
+      if(c.codes) r.appendChild(mini(c.codes,c.pred));
+      if(c.level) r.appendChild(el("span","lvl lvl-"+c.level,c.level));
+      if(c.cost) r.appendChild(el("span","cmp-where","cost: "+c.cost));
+      r.appendChild(el("span","cmp-where","prompts go to: "+c.where)); b.appendChild(r);
+      b.appendChild(el("span","cmp-note",c.note));
+      b.setAttribute("aria-label","Setup: "+c.name+(c.codes?". "+JOBS.map(function(j,ji){return j+": "+ST[c.codes.charAt(ji)];}).join(". "):"")+".");
+      b.addEventListener("click",function(){
+        state.cmp=c.ci; state.hl=c.syms; state.pick=bySym[c.syms[0]]; paint();
+        document.querySelector(".chart").scrollIntoView({block:"start",behavior:"smooth"});
+      });
+      g.appendChild(b);
+    });
+    box.appendChild(g);
+  });
+})();
+
+/* colour key and the per-job score, both computed from the data */
+(function(){
+  var lg=document.getElementById("legend");
+  ORDER.forEach(function(k){var li=el("li"); li.appendChild(el("span","sw s-"+k,k)); li.appendChild(el("span",null,ST[k])); lg.appendChild(li);});
+  var hl=el("li"); hl.appendChild(el("span","sw hatch","")); hl.appendChild(el("span",null,"Hatched: predicted from a neighbour")); lg.appendChild(hl);
+  var gl=el("li"); gl.appendChild(el("span","sw gap","")); gl.appendChild(el("span",null,"Dashed tile: a gap the pattern predicts")); lg.appendChild(gl);
+  var nx=el("li"); nx.appendChild(el("span","sw gap","+1")); nx.appendChild(el("span",null,"A next version is expected")); lg.appendChild(nx);
+  [["I","Picture"],["V","Video"],["A","Voice"],["M","Music"],["D","3D"],["mach","Machine"],["T","Runtime"],["R","Route"],["C","Catalyst"]].forEach(function(k){
+    var li=el("li"); li.appendChild(el("span","sw k-"+k[0],"")); li.appendChild(el("span",null,k[1])); lg.appendChild(li);
+  });
+  var sc=document.getElementById("score");
+  JOBS.forEach(function(j,ji){
+    var t={s:0,c:0,a:0,p:0,u:0};
+    elements.forEach(function(x){x.iso.forEach(function(iso){
+      var g=gradeOf(iso,ji);
+      if(g==="n") t.u++; else if(g==="p") t.p++; else if(g==="c") t.c++; else if(g==="a") t.a++; else t.s++;
+    });});
+    var li=el("li"); li.appendChild(el("b",null,(ji+1)+" "+j+" "));
+    li.appendChild(el("span",null,t.s+" sourced · "+t.c+" by custody · "+t.a+" assumed · "+t.p+" predicted · "+t.u+" unknown")); sc.appendChild(li);
+  });
+})();
+
+function paint(){
+  var ps=state.pick?(state.pick.kind==="gap"?"gap"+state.pick.gi:state.pick.sym):"";
+  Array.prototype.forEach.call(document.querySelectorAll(".chart .el"),function(b){
+    b.setAttribute("aria-pressed",String(b.dataset.sym===ps));
+    b.classList.toggle("hl",!!state.hl&&state.hl.indexOf(b.dataset.sym)>=0);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cmp"),function(b){b.setAttribute("aria-pressed",String(Number(b.dataset.c)===state.cmp));});
+  var p=state.pick;
+  if(p.kind==="model") detail(p); else if(p.kind==="gap") gapDetail(p); else plainDetail(p);
+}
+function extra(parent,label,text){var p=el("p","d-extra"); p.appendChild(el("b",null,label)); p.appendChild(document.createTextNode(text)); parent.appendChild(p);}
+function shellOf(n){return SHELLS[n-1];}
+function frozen(t){t.classList.add("d-tile"); t.disabled=true; t.style.cursor="default"; return t;}
+function usedIn(parent,sym){
+  var list=compounds.filter(function(c){return c.syms.indexOf(sym)>=0;});
+  if(!list.length) return;
+  var p=el("p","d-extra"); p.appendChild(el("b",null,"Compounds that use it:")); parent.appendChild(p);
+  var ul=el("ul","uses");
+  list.forEach(function(c){var li=el("li"); li.appendChild(document.createTextNode(c.syms.join(" · ")+"  ")); li.appendChild(document.createTextNode(c.name)); ul.appendChild(li);});
+  parent.appendChild(ul);
+}
+
+function detail(x){
+  var face=x.iso[0], s=shellOf(x.shell), box=document.getElementById("detail"); box.textContent="";
+  var left=el("div"), head=el("div","d-head");
+  head.appendChild(frozen(tile(x)));
+  var hd=el("div"); hd.style.minWidth="0";
+  hd.appendChild(el("h2","d-name",face.name));
+  hd.appendChild(el("p","d-sub","No. "+x.no+" · Model line · "+x.lab+" · "+x.country+" · Shell "+s.n+", "+s.name+" ("+s.cap+")"+(x.size?" · "+x.size:"")+" · Released "+face.date));
+  head.appendChild(hd); left.appendChild(head);
+  left.appendChild(el("p","d-note",face.note));
+  left.appendChild(el("p","d-route","Routes: "+ROUTE[s.kind]));
+  if(VENDOR[x.lab]) left.appendChild(el("p","d-route","At "+x.lab+": "+VENDOR[x.lab]));
+  usedIn(left,x.sym);
+  box.appendChild(left);
+
+  var right=el("div"); right.style.minWidth="0";
+  var tb=el("div","tablebox"), tab=el("table","jobs"), hr=el("tr");
+  ["Job","On your own","As an organization","Checked"].forEach(function(h){hr.appendChild(el("th",null,h));});
+  var th=el("thead"); th.appendChild(hr); tab.appendChild(th);
+  var body=el("tbody"), anyP=false, anyU=false;
+  JOBS.forEach(function(j,ji){
+    var c=face.codes.charAt(ji), g=gradeOf(face,ji); if(g==="p") anyP=true; if(c==="U") anyU=true;
+    var tr=el("tr"); tr.appendChild(el("td",null,(ji+1)+" "+j));
+    [c,orgCode(c)].forEach(function(cc){var td=el("td"); td.appendChild(el("span","pill s-"+cc,ST[cc])); tr.appendChild(td);});
+    var gtd=el("td"); gtd.appendChild(el("span","grade",GR[g])); tr.appendChild(gtd);
+    body.appendChild(tr);
+  });
+  tab.appendChild(body); tb.appendChild(tab); right.appendChild(tb);
+  if(anyP&&face.nb) extra(right,"Predicted from: ",face.nb+".");
+  if(x.settle&&anyU) extra(right,"What would settle the unknown: ",x.settle);
+  if(s.kind==="local") extra(right,"To see what it really does: ",LOCAL);
+  if(x.next) extra(right,"Next version expected: ",x.next);
+
+  if(x.iso.length>1){
+    var ib=el("div","tablebox"), it=el("table","jobs"); it.appendChild(el("caption",null,"Isotopes: older versions of this line"));
+    var ih=el("tr"); ["Version","1 2 3","Released","Note"].forEach(function(h){ih.appendChild(el("th",null,h));});
+    var ithd=el("thead"); ithd.appendChild(ih); it.appendChild(ithd);
+    var ibody=el("tbody");
+    x.iso.slice(1).forEach(function(iso){
+      var tr=el("tr"); tr.appendChild(el("td",null,iso.name));
+      var td=el("td"); td.appendChild(mini(iso.codes,[0,1,2].map(function(j){return gradeOf(iso,j)==="p";}))); tr.appendChild(td);
+      tr.appendChild(el("td",null,iso.date)); tr.appendChild(el("td",null,iso.note));
+      ibody.appendChild(tr);
+    });
+    it.appendChild(ibody); ib.appendChild(it); ib.style.marginTop="16px"; right.appendChild(ib);
+  }
+  box.appendChild(right);
+}
+function gapDetail(g){
+  var s=shellOf(g.shell), box=document.getElementById("detail"); box.textContent="";
+  var left=el("div"), head=el("div","d-head");
+  head.appendChild(frozen(gapTile(g)));
+  var hd=el("div"); hd.style.minWidth="0";
+  hd.appendChild(el("h2","d-name",g.name));
+  hd.appendChild(el("p","d-sub","A gap · "+g.lab+" · Shell "+s.n+", "+s.name+" · Not released, or not found"));
+  head.appendChild(hd); left.appendChild(head);
+  left.appendChild(el("p","d-note",g.basis));
+  box.appendChild(left);
+  var right=el("div"); right.style.minWidth="0";
+  var tb=el("div","tablebox"), tab=el("table","jobs"), hr=el("tr");
+  ["Job","Predicted","Checked"].forEach(function(h){hr.appendChild(el("th",null,h));});
+  var th=el("thead"); th.appendChild(hr); tab.appendChild(th);
+  var body=el("tbody");
+  JOBS.forEach(function(j,ji){
+    var c=g.codes.charAt(ji), tr=el("tr"); tr.appendChild(el("td",null,(ji+1)+" "+j));
+    var td=el("td"); td.appendChild(el("span","pill s-"+c,ST[c])); tr.appendChild(td);
+    var gtd=el("td"); gtd.appendChild(el("span","grade","predicted from its cell")); tr.appendChild(gtd);
+    body.appendChild(tr);
+  });
+  tab.appendChild(body); tb.appendChild(tab); right.appendChild(tb);
+  extra(right,"How to test it: ",g.test);
+  box.appendChild(right);
+}
+function plainDetail(o){
+  var box=document.getElementById("detail"); box.textContent="";
+  var left=el("div"), head=el("div","d-head");
+  head.appendChild(frozen(plainTile(o)));
+  var hd=el("div"); hd.style.minWidth="0";
+  hd.appendChild(el("h2","d-name",o.name));
+  hd.appendChild(el("p","d-sub","No. "+o.no+" · "+KIND[o.kind]+(o.kind==="mach"?" · Shell "+o.shell+", "+shellOf(o.shell).name:"")));
+  head.appendChild(hd); left.appendChild(head);
+  left.appendChild(el("p","d-note",o.note));
+  box.appendChild(left);
+  var right=el("div"); right.style.minWidth="0";
+  if(o.kind==="mach"){
+    var fit=elements.filter(function(x){return x.shell<=o.shell;}).map(function(x){return x.sym;});
+    extra(right,"Models it can hold: ","every open model in shells 1 to "+o.shell+" ("+fit.length+" lines): "+fit.join(", ")+".");
+  }
+  usedIn(right,o.sym);
+  box.appendChild(right);
+}
+
+var src=document.getElementById("sources");
+SRC.forEach(function(grp){
+  var li=el("li"); li.appendChild(el("b",null,grp[0])); li.appendChild(document.createTextNode(": "));
+  grp[1].forEach(function(s,i){
+    var a=el("a",null,s[0]); a.href=s[1]; a.target="_blank"; a.rel="noopener";
+    if(i) li.appendChild(document.createTextNode(", "));
+    li.appendChild(a);
+  });
+  src.appendChild(li);
+});
+
+paint();
+})();
+</script>
+
+</body>
+</html>
