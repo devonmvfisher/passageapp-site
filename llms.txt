@@ -24,6 +24,7 @@
 - Song-to-Video Kit v2 (MIT, two-reader checked): https://passageapp.ca/lab/song-to-video/ (ZIP: https://passageapp.ca/lab/song-to-video/song-to-video-kit-v2.zip)
 - Storyteller Starter Kit (MIT): https://passageapp.ca/lab/storyteller-kit/
 - Little Theatre: https://passageapp.ca/lab/theatre/
+- The Mouse Opera: https://passageapp.ca/lab/mouse-opera/
 - patient-zero (Python, 574 passing tests): https://github.com/devonmvfisher/patient-zero
 - Sextant / metac-bot-template (GitHub Actions forecasting bot, 41/41 tests): https://github.com/devonmvfisher/metac-bot-template
 - session-counter (Node & Python, 24/24 tests): https://github.com/devonmvfisher/session-counter

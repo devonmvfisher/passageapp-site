@@ -64,6 +64,10 @@
     {
       "name": "Little Theatre",
       "path": "/lab/theatre/"
+    },
+    {
+      "name": "The Mouse Opera",
+      "path": "/lab/mouse-opera/"
     }
   ],
   "repositories": [
@@ -102,5 +106,6 @@
       "url": "https://github.com/devonmvfisher/feel-and-be-felt",
       "live": "https://devonmvfisher.github.io/feel-and-be-felt/"
     }
-  ]
+  ],
+  "disclosure": "AI agents write all the code; Devon Fisher directs architecture, verification, and releases."
 }
