@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Periodic Table of Local AI &amp; Roofline Engine | Passage Lab</title>
+<meta name="description" content="Passage Door 03 interactive lab tool: Live-VRAM Periodic Table of AI Elements, memory-bandwidth roofline calculator, and sovereign local hardware math. Zero login wall, MIT licensed.">
+<link rel="canonical" href="https://passageapp.ca/lab/local-ai/">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#090507">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Grenze+Gotisch:wght@700;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../style.css">
+<style>
+  body.pro-surface .brand-name { font: 700 23px/1 var(--f-serif); letter-spacing: .01em; }
+  body.pro-surface h2.sec-h { font: 700 clamp(26px, 3.2vw, 34px)/1.08 var(--f-serif); letter-spacing: -.01em; }
+  .lab-wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+  .lab-hero { padding: 30px 0 18px; border-bottom: 1px solid var(--rule); display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; }
+  .lab-hero h1 { margin: 0; font: 700 clamp(32px, 4.4vw, 48px)/1.02 var(--f-serif); color: var(--white); letter-spacing: -.015em; }
+  .lab-hero p { margin: 8px 0 0; color: var(--dim); max-width: 68ch; font-size: 15px; }
+  .p-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .p-tab {
+    background: var(--panel); color: var(--dim); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 9px 15px; font: 600 13.5px/1 var(--f-sans); cursor: pointer; transition: all .15s;
+  }
+  .p-tab:hover { border-color: var(--frame); color: var(--white); }
+  .p-tab.active { background: rgba(184, 20, 45, .24); border-color: var(--gold); color: var(--white); }
+  .p-panel-view { display: none; padding-top: 18px; }
+  .p-panel-view.active { display: block; }
+
+  .control-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+    padding: 12px 16px; border-radius: 10px; background: var(--panel); border: 1px solid var(--rule); margin-bottom: 12px;
+  }
+  .ctrl-grp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .ctrl-grp label { font: 600 11px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+  .p-select, .p-input {
+    height: 36px; padding: 0 11px; border-radius: 6px; border: 1px solid var(--frame);
+    background: var(--ink2); color: var(--white); font: 500 13.5px var(--f-sans);
+  }
+  .p-pill-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .p-pill {
+    padding: 6px 10px; border-radius: 5px; border: 1px solid var(--rule); background: var(--ink2);
+    color: var(--dim); font: 600 12px/1 var(--f-mono); cursor: pointer; transition: all .14s;
+  }
+  .p-pill:hover { border-color: var(--gold); color: var(--white); }
+  .p-pill.active { background: var(--crimson); border-color: var(--crimson2); color: var(--white); }
+
+  .legend-row { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 12px; font-size: 12.5px; color: var(--dim); }
+  .lg-item { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 13px; height: 13px; border-radius: 3px; border: 1px solid transparent; }
+  .sw-fast { background: rgba(74, 222, 128, .18); border-color: rgba(74, 222, 128, .65); }
+  .sw-fit { background: rgba(214, 168, 90, .18); border-color: rgba(214, 168, 90, .65); }
+  .sw-off { background: rgba(245, 158, 11, .16); border-color: rgba(251, 191, 36, .6); }
+  .sw-no { background: rgba(255, 255, 255, .04); border-color: var(--rule); }
+  .sw-cloud { background: rgba(184, 20, 45, .18); border-color: rgba(224, 36, 66, .55); }
+
+  /* Periodic Table Frame */
+  .pt-frame {
+    background: linear-gradient(180deg, rgba(22, 10, 14, .96), rgba(11, 5, 8, .98));
+    border: 1px solid var(--frame); border-radius: 10px; padding: 14px; overflow-x: auto;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .55);
+  }
+  .pt-axis {
+    display: flex; align-items: center; gap: 10px; font: 600 10.5px var(--f-mono); letter-spacing: .1em;
+    text-transform: uppercase; color: var(--gold); margin: 0 0 8px 146px; min-width: 980px;
+  }
+  .pt-axis i { flex: 1; height: 1px; background: var(--rule); }
+  .pt-grid { display: grid; grid-template-columns: 140px repeat(12, minmax(76px, 1fr)); gap: 5px; min-width: 1120px; }
+  .pt-fam { padding: 0 4px 6px; border-bottom: 1.5px solid var(--gold); min-width: 0; }
+  .pt-fam b { display: block; font: 700 12.5px/1.15 var(--f-serif); color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pt-fam span { display: block; font: 500 9.5px var(--f-mono); color: var(--dim); }
+  .pt-shell { padding: 4px 8px 4px 2px; border-right: 1px solid var(--rule); display: flex; flex-direction: column; justify-content: center; }
+  .pt-shell strong { font: 700 13px/1.1 var(--f-serif); color: var(--white); }
+  .pt-shell em { font: 500 10px var(--f-mono); font-style: normal; color: var(--gold); margin-top: 2px; }
+  .pt-shell span { font-size: 10px; color: var(--dim); }
+  .pt-custody {
+    grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 4px 0;
+    font: 600 10.5px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--crimson2);
+  }
+  .pt-custody i { flex: 1; border-top: 1px dashed rgba(224, 36, 66, .55); }
+
+  .el-cell {
+    height: 68px; border-radius: 6px; border: 1px solid var(--rule); background: var(--ink2);
+    padding: 4px 6px 5px; text-align: left; cursor: pointer; color: var(--text);
+    display: flex; flex-direction: column; justify-content: space-between;
+    transition: transform .14s, border-color .14s, box-shadow .14s;
+  }
+  .el-cell:hover { transform: translateY(-2px); border-color: var(--gold); z-index: 3; }
+  .el-cell.selected { box-shadow: 0 0 0 2px var(--white); z-index: 4; }
+  .el-cell.comp-hl { box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(214, 168, 90, .42); z-index: 5; }
+  .el-cell.st-fast { background: rgba(74, 222, 128, .12); border-color: rgba(74, 222, 128, .45); }
+  .el-cell.st-fit { background: rgba(214, 168, 90, .14); border-color: rgba(214, 168, 90, .52); }
+  .el-cell.st-offload { background: rgba(245, 158, 11, .14); border-color: rgba(251, 191, 36, .48); }
+  .el-cell.st-exceed { background: rgba(255, 255, 255, .025); border-color: rgba(214, 168, 90, .12); opacity: .55; }
+  .el-cell.st-cloud { background: rgba(184, 20, 45, .15); border-color: rgba(224, 36, 66, .42); }
+  .el-top { display: flex; justify-content: space-between; font: 500 9.5px/1.1 var(--f-mono); color: var(--dim); }
+  .el-sym { font: 700 18px/1 var(--f-serif); color: var(--white); letter-spacing: .01em; margin-top: 1px; }
+  .el-name { font: 500 9.5px/1.15 var(--f-sans); color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .el-metric { font: 600 9.5px/1.1 var(--f-mono); color: var(--text); }
+  .el-cell.st-fast .el-metric { color: #4ade80; }
+  .el-cell.st-fit .el-metric { color: var(--gold); }
+  .el-cell.st-offload .el-metric { color: #fcd34d; }
+  .el-cell.st-cloud .el-metric { color: #ffadb8; }
+  .el-empty { height: 68px; border-radius: 6px; border: 1px dashed rgba(214, 168, 90, .1); }
+
+  /* Inspector + Compounds */
+  .inspector {
+    margin-top: 16px; background: var(--panel); border: 1px solid var(--frame); border-radius: 10px;
+    padding: 20px 22px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px;
+  }
+  .insp-head { display: flex; align-items: center; gap: 14px; }
+  .insp-sym {
+    width: 60px; height: 60px; border-radius: 8px; border: 1.5px solid var(--gold);
+    background: radial-gradient(circle at 50% 35%, rgba(184, 20, 45, .36), var(--ink) 85%);
+    display: grid; place-items: center; font: 700 26px var(--f-serif); color: var(--white); flex: none;
+  }
+  .insp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .insp-stat { background: var(--ink2); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+  .insp-stat b { display: block; font: 600 15px var(--f-mono); color: var(--white); }
+  .insp-stat span { display: block; font-size: 11.5px; color: var(--dim); margin-top: 2px; }
+
+  .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 12px; }
+  .comp-card {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px;
+    text-align: left; color: var(--text); cursor: pointer; display: flex; flex-direction: column; gap: 7px; transition: all .15s;
+  }
+  .comp-card:hover { border-color: var(--frame); background: var(--panel2); }
+  .comp-card.active { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+  .comp-top { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .comp-card h4 { margin: 2px 0 0; font: 700 19px/1.15 var(--f-serif); color: var(--white); }
+  .comp-card p { margin: 0; font-size: 13px; color: var(--dim); }
+
+  /* Roofline Calculator */
+  .calc-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr); gap: 18px; align-items: start; }
+  .calc-box { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; }
+  .calc-box h3 { margin: 0 0 12px; font: 700 20px/1.15 var(--f-serif); color: var(--white); }
+  .f-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .f-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .flbl { display: block; font: 600 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+  .calc-out {
+    position: sticky; top: 76px; background: linear-gradient(160deg, rgba(29, 13, 19, .98), rgba(9, 5, 7, .99));
+    border: 1px solid var(--gold); border-radius: 12px; padding: 22px; box-shadow: 0 18px 42px rgba(0, 0, 0, .55);
+  }
+  .c-status { display: inline-block; max-width: 100%; padding: 7px 11px; border-radius: 6px; font: 600 12px/1.35 var(--f-mono); margin-bottom: 14px; }
+  .c-status.ok { background: rgba(74, 222, 128, .14); color: #86efac; border: 1px solid rgba(74, 222, 128, .4); }
+  .c-status.warn { background: rgba(245, 158, 11, .14); color: #fcd34d; border: 1px solid rgba(245, 158, 11, .4); }
+  .c-status.bad { background: rgba(184, 20, 45, .24); color: #fda4af; border: 1px solid var(--crimson2); }
+  .c-big { font: 700 40px/1 var(--f-mono); color: var(--white); }
+  .c-big small { font-size: 14px; color: var(--dim); font-weight: 400; }
+  .c-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .vbar { height: 15px; border-radius: 99px; background: rgba(255, 255, 255, .08); overflow: hidden; display: flex; margin: 8px 0 10px; }
+  .vb-w { background: var(--gold); }
+  .vb-k { background: var(--crimson2); }
+  .vb-o { background: #4ade80; }
+  .vleg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 10px; font: 500 11.5px var(--f-mono); color: var(--text); }
+  .formula-note { margin-top: 14px; padding: 10px 12px; border-radius: 6px; background: rgba(0, 0, 0, .35); border: 1px solid var(--rule); font: 400 11.5px/1.5 var(--f-mono); color: var(--dim); }
+
+  .hw-specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; border-radius: 6px; background: var(--ink2); border: 1px solid var(--rule); }
+  .hw-specs b { display: block; font: 600 14px var(--f-mono); color: var(--white); }
+  .hw-specs span { font-size: 11px; color: var(--dim); }
+
+  .p-toast {
+    position: fixed; right: 20px; bottom: 20px; z-index: 90; padding: 10px 16px; border-radius: 8px;
+    background: var(--gold); color: var(--ink); font: 700 13px var(--f-sans); opacity: 0; transform: translateY(8px);
+    pointer-events: none; transition: opacity .18s, transform .18s;
+  }
+  .p-toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 920px) {
+    .inspector, .calc-layout { grid-template-columns: 1fr; }
+    .calc-out { position: static; }
+  }
+  @media (max-width: 640px) {
+    .f-grid3, .f-grid2, .insp-stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="pro-surface">
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="../../index.html" aria-label="Passage Home">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span class="brand-name">Passage</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="../../security/">Security</a>
+      <a href="../../services/">Services &amp; Hire</a>
+      <a href="../" class="active">Interactive Lab</a>
+      <a href="../../studio/">Worlds &amp; Studio</a>
+      <a href="../../services/#support">Support</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="pill-mono" href="../">Door 03: Lab</a>
+      <a class="btn sm" href="../../services/#contact">Work With Me</a>
+    </div>
+  </div>
+</header>
+
+<main class="lab-wrap">
+  <section class="lab-hero">
+    <div>
+      <p class="eyebrow">Door 03 &middot; Interactive Lab &middot; Live Hardware Physics</p>
+      <h1>The Periodic Table of Local AI</h1>
+      <p>Myth on one side, memory bandwidth on the other. Rows are hardware custody shells from 8 GB laptops to hosted lab vaults. Pick your metal and watch every element recalculate live from real transformer roofline math. Zero login walls, zero fake telemetry.</p>
+      <div class="p-tabs" role="tablist" aria-label="Lab instruments">
+        <button type="button" class="p-tab active" data-tab="periodic">01 &middot; Live Periodic Table</button>
+        <button type="button" class="p-tab" data-tab="calculator">02 &middot; Roofline Calculator</button>
+        <button type="button" class="p-tab" data-tab="hardware">03 &middot; Hardware &amp; Sovereign Math</button>
+      </div>
+    </div>
+    <div class="pill-mono" id="rig-telemetry">RTX 3090 24GB</div>
+  </section>
+
+  <!-- PANEL 1: PERIODIC TABLE -->
+  <section class="p-panel-view active" id="panel-periodic">
+    <div class="control-bar">
+      <div class="ctrl-grp">
+        <label for="pt-hw">Hardware</label>
+        <select class="p-select" id="pt-hw"></select>
+      </div>
+      <div class="ctrl-grp">
+        <label>Count</label>
+        <div class="p-pill-row" id="pt-gpus"></div>
+      </div>
+      <div class="ctrl-grp">
+        <label>Quant</label>
+        <div class="p-pill-row" id="pt-quant"></div>
+      </div>
+    </div>
+
+    <div class="legend-row">
+      <span class="lg-item"><span class="sw sw-fast"></span>Fits VRAM (&ge; 30 tok/s)</span>
+      <span class="lg-item"><span class="sw sw-fit"></span>Fits VRAM (&lt; 30 tok/s)</span>
+      <span class="lg-item"><span class="sw sw-off"></span>Partial CPU offload</span>
+      <span class="lg-item"><span class="sw sw-no"></span>Exceeds VRAM</span>
+      <span class="lg-item"><span class="sw sw-cloud"></span>Hosted Lab Vault (below custody line)</span>
+    </div>
+
+    <div class="pt-frame">
+      <div class="pt-axis"><span>Open Weights First</span><i></i><span>Closed / Hosted Labs</span></div>
+      <div class="pt-grid" id="pt-grid"></div>
+    </div>
+
+    <div class="inspector" id="pt-inspector" aria-live="polite"></div>
+
+    <section class="band" style="padding-top:32px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+        <div>
+          <p class="eyebrow">Working Setups</p>
+          <h2 class="sec-h">Compound Rigs</h2>
+        </div>
+        <button type="button" class="btn ghost sm" id="clear-comp">Clear Highlight</button>
+      </div>
+      <div class="comp-grid" id="compounds-grid"></div>
+    </section>
+
+    <section class="band" style="padding-top:30px">
+      <div class="term">
+        <div class="term-bar">
+          <span>passage-lab ~ measure-your-own-metal</span>
+          <div class="p-pill-row" id="cli-engines">
+            <button type="button" class="p-pill active" data-ce="llamacpp">llama-bench</button>
+            <button type="button" class="p-pill" data-ce="ollama">Ollama</button>
+            <button type="button" class="p-pill" data-ce="vllm">vLLM</button>
+            <button type="button" class="p-pill" data-ce="mlx">MLX</button>
+          </div>
+        </div>
+        <div class="term-body" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div><span class="p">$</span> <code id="cli-cmd"></code></div>
+          <button type="button" class="btn sm" id="cli-copy">Copy Command</button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- PANEL 2: ROOFLINE CALCULATOR -->
+  <section class="p-panel-view" id="panel-calculator">
+    <div class="calc-layout">
+      <div>
+        <div class="calc-box">
+          <h3>01 &middot; Hardware Memory</h3>
+          <div class="f-grid2" style="margin-bottom:12px">
+            <div><label class="flbl" for="c-hw">Preset</label><select class="p-select" id="c-hw" style="width:100%"></select></div>
+            <div><span class="flbl">Count</span><div class="p-pill-row" id="c-gpus"></div></div>
+          </div>
+          <div class="f-grid3">
+            <div><label class="flbl" for="c-vram">VRAM / GPU (GB)</label><input class="p-input" id="c-vram" type="number" min="4" max="1024" style="width:100%"></div>
+            <div><label class="flbl" for="c-bw">Bandwidth (GB/s)</label><input class="p-input" id="c-bw" type="number" min="20" max="10000" style="width:100%"></div>
+            <div><label class="flbl" for="c-overhead">Overhead (GB)</label><input class="p-input" id="c-overhead" type="number" min="0.5" max="32" step="0.5" style="width:100%"></div>
+          </div>
+        </div>
+
+        <div class="calc-box">
+          <h3>02 &middot; Weights &amp; Architecture</h3>
+          <div style="margin-bottom:12px"><label class="flbl" for="c-model">Model Preset</label><select class="p-select" id="c-model" style="width:100%"></select></div>
+          <div class="f-grid3">
+            <div><label class="flbl" for="c-totalb">Total Params (B)</label><input class="p-input" id="c-totalb" type="number" min="1" max="3000" step="0.5" style="width:100%"></div>
+            <div><label class="flbl" for="c-activeb">Active Params (B)</label><input class="p-input" id="c-activeb" type="number" min="0.5" max="1000" step="0.5" style="width:100%"></div>
+            <div>
+              <label class="flbl" for="c-bits">Precision</label>
+              <select class="p-select" id="c-bits" style="width:100%">
+                <option value="4.5">Q4_K_M (~4.5 bpw)</option>
+                <option value="6.5">Q6_K (~6.5 bpw)</option>
+                <option value="8">Q8_0 / FP8 (8 bpw)</option>
+                <option value="16">BF16 / FP16 (16 bpw)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-box">
+          <h3>03 &middot; Context, KV Cache &amp; Speculative Decode</h3>
+          <div class="f-grid3" style="margin-bottom:12px">
+            <div>
+              <label class="flbl" for="c-ctx">Context Length</label>
+              <select class="p-select" id="c-ctx" style="width:100%">
+                <option value="4096">4K tokens</option>
+                <option value="8192">8K tokens</option>
+                <option value="16384">16K tokens</option>
+                <option value="32768" selected>32K tokens</option>
+                <option value="65536">64K tokens</option>
+                <option value="131072">128K tokens</option>
+              </select>
+            </div>
+            <div>
+              <label class="flbl" for="c-kv">KV Cache Precision</label>
+              <select class="p-select" id="c-kv" style="width:100%">
+                <option value="2">FP16 (2 bytes)</option>
+                <option value="1">FP8 / Q8 (1 byte)</option>
+                <option value="0.5">Q4 (0.5 bytes)</option>
+              </select>
+            </div>
+            <div><label class="flbl" for="c-mintok">Min Speed (tok/s)</label><input class="p-input" id="c-mintok" type="number" min="5" max="200" style="width:100%"></div>
+          </div>
+          <div class="f-grid2">
+            <div>
+              <span class="flbl">Decoding Method</span>
+              <div class="p-pill-row" id="c-spec">
+                <button type="button" class="p-pill active" data-s="0">Standard</button>
+                <button type="button" class="p-pill" data-s="1">Speculative (+draft)</button>
+              </div>
+            </div>
+            <div><label class="flbl" for="c-accept">Draft Acceptance Rate</label><input class="p-input" id="c-accept" type="number" min="0.2" max="0.95" step="0.05" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="calc-out" id="c-output"></aside>
+    </div>
+  </section>
+
+  <!-- PANEL 3: HARDWARE & SOVEREIGN MATH -->
+  <section class="p-panel-view" id="panel-hardware">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+      <div>
+        <p class="eyebrow">Uniform Hardware Matrix</p>
+        <h2 class="sec-h">Compare Rigs Without Grid Bloat</h2>
+      </div>
+      <input class="p-input" id="hw-search" type="search" placeholder="Filter GPUs, Apple Silicon, CPU..." style="width:280px;max-width:100%">
+    </div>
+
+    <div class="grid-3" id="hw-grid"></div>
+
+    <section class="band">
+      <p class="eyebrow">Manitoba &amp; Canadian Hydro Math (~$0.11 CAD / kWh)</p>
+      <h2 class="sec-h">Sovereign Compute Reality Check</h2>
+      <div class="grid-3">
+        <article class="card">
+          <span class="card-num">Power Cost &middot; 350W Load</span>
+          <h3>~$0.04 CAD / Hour</h3>
+          <p>Running Qwen3.8-27B locally on a used RTX 3090 draws about 4 cents of hydro electricity per hour with zero token meter and zero prompts leaving your desk.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">Hardware Amortization</span>
+          <h3>~750M Output Tokens</h3>
+          <p>A $750 used 24 GB card beats $1/1M-token APIs strictly on heavy sustained volume. Local wins immediately on custody, zero rate limits, and offline reliability.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">Unified Memory Wall Draw</span>
+          <h3>140W to 185W Silent</h3>
+          <p>Apple M3/M5 Ultra and Grace/Strix Halo unified boxes hold 120B-400B sparse MoE weights at a quarter the wall wattage of a 4-GPU rack server.</p>
+        </article>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <span><strong>Passage</strong> &middot; Devon Fisher &middot; Powerview, Manitoba, Canada</span>
+      <div class="foot-links">
+        <a href="../../index.html">Hub</a>
+        <a href="../">Door 03: Lab</a>
+        <a href="../ai-table/">Legacy Table</a>
+        <a href="../../security/">Security</a>
+        <a href="https://github.com/devonmvfisher" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <p class="foot-credit">Code MIT unless noted. All tok/s and VRAM figures are clean-room memory-bandwidth roofline estimates computed locally in your browser; zero scraped user data, zero external tracking.</p>
+  </div>
+</footer>
+
+<div class="p-toast" id="p-toast" role="status" aria-live="polite"></div>
+<script src="engine.js"></script>
+</body>
+</html>
